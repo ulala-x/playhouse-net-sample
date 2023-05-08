@@ -31,7 +31,7 @@ namespace SimplePlay
 
                 var playOption = new PlayOption();
 
-                playOption.ElementConfigurator.Register(
+                playOption.PlayProducer.Register(
                     "simple", 
                     (stageSender) => new SimpleRoom(stageSender), 
                     (actorSender) => new SimpleUser(actorSender)
