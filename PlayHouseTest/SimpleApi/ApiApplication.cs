@@ -9,14 +9,29 @@ using Serilog;
 using SimpleApi.handler;
 using PlayHouse.Production;
 using PlayHouse.Production.Api;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace SimpleApi
 {
     public class ApiApplication 
     {
-        private readonly ILogger _log = Log.Logger;
+        private readonly Serilog.ILogger _log = Log.Logger;
+        private IServiceCollection _services { get; } = new ServiceCollection();
 
-        public void Run(params string[] args)
+        public void RegisterService()
+        {
+            //_services.AddLogging
+            //var loggerFactory = new LoggerFactory().AddSerilog(Log.Logger,dispose:true);
+            _services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
+            //_services.AddSingleton<ILoggerFactory>(loggerFactory);
+            _services.AddTransient<SampleApiController>();
+            _services.AddTransient<SampleApiForRoom>();
+
+            GlobalServiceProvider.Instance = _services.BuildServiceProvider();
+        }
+
+        public void Run()
         {
             try
             {
@@ -38,9 +53,9 @@ namespace SimpleApi
 
                 AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
                 {
-                    _log.Information("*** shutting down Api server since process is shutting down");
+                    Log.Logger.Information("*** shutting down Api server since process is shutting down");
                     apiServer.Stop();
-                    _log.Information("*** server shut down");
+                    Log.Logger.Information("*** server shut down");
                     Thread.Sleep(1000);
                 };
 

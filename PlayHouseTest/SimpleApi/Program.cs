@@ -12,7 +12,8 @@ namespace SimpleApi
                     .CreateLogger();
 
             var runner = new ApiApplication();
-            runner.Run(args);
+            runner.RegisterService();
+            runner.Run();
              
         }
     }

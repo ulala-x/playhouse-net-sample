@@ -14,7 +14,10 @@ namespace SimpleApi
         public ApiSystem(ISystemPanel systemPanel, ISender sender)
         {
             _panel = systemPanel;
-            _sender = sender; 
+            _sender = sender;
+
+            GlobalControlProvider.SystemPanel = systemPanel;
+            GlobalControlProvider.Sender = sender;
         }
 
         public async Task OnDispatch(Packet packet)

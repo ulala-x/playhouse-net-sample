@@ -1,35 +1,27 @@
 ﻿using Google.Protobuf;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Playhouse.Simple.Protocol;
 using PlayHouse.Production;
 using PlayHouse.Production.Api;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using ILogger = Serilog.ILogger;
 
 namespace SimpleApi.handler
 {
-    public class SampleApi : IApiService
+    public class SampleApiController : IApiController
     {
-        private ISystemPanel? _systemPanel;
-        private ISender? _sender;
-        private ILogger _log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-
-        public  async Task Init(ISystemPanel systemPanel, ISender sender)
+        private readonly ILogger<SampleApiController> _log;
+ 
+        public SampleApiController(ILogger<SampleApiController> log)
         {
-            this._systemPanel = systemPanel;
-            this._sender = sender;
-            await Task.CompletedTask;
+            _log = log;
         }
 
-        public  IApiService Instance()
-        {
-            return new SampleApi();
-        }
 
         public  void Handles(IHandlerRegister register, IBackendHandlerRegister backendRegister)
         {
@@ -45,7 +37,7 @@ namespace SimpleApi.handler
         {
             var req = AuthenticateReq.Parser.ParseFrom(packet.Data);
             long accountId = req.UserId;
-            _log.Information($"authenticate: accountId:{accountId},token:{req.Token},sid:{apiSender.Sid}");
+            _log.LogInformation($"authenticate: accountId:{accountId},token:{req.Token},sid:{apiSender.Sid}");
 
             apiSender.Authenticate(accountId);
 
@@ -57,7 +49,7 @@ namespace SimpleApi.handler
         private async Task Hello(Packet packet, IApiSender apiSender)
         {
             var req = HelloReq.Parser.ParseFrom(packet.Data);
-            _log.Information($"hello:{req.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
+            _log.LogInformation($"hello:{req.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
             apiSender.Reply(new ReplyPacket (new HelloRes { Message = "hello" }));
             await Task.CompletedTask;
         }
@@ -65,17 +57,22 @@ namespace SimpleApi.handler
         private async Task SendMessage(Packet packet, IApiSender apiSender)
         {
             var recv = SendMsg.Parser.ParseFrom(packet.Data);
-            _log.Information($"message:{recv.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
+            _log.LogInformation($"message:{recv.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
             apiSender.SendToClient(new Packet(new SendMsg() { Message = recv.Message}));
             await Task.CompletedTask;
         }
 
         private async Task CloseSessionMsg(Packet packet, IApiSender apiSender)
         {
-            _log.Information($"closeSessionMsg - accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
+            _log.LogInformation($"closeSessionMsg - accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
             apiSender.SendToClient(new Packet (new CloseSessionMsg()));
             apiSender.SessionClose(apiSender.SessionEndpoint, apiSender.Sid);
             await Task.CompletedTask;
+        }
+
+        public IApiController Instance()
+        {
+            return GlobalServiceProvider.Instance.GetService<SampleApiController>()! ;
         }
     }
 }

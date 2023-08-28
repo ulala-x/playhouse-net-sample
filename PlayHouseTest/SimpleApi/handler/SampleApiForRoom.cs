@@ -9,30 +9,31 @@ using System.Text;
 using System.Threading.Tasks;
 using PlayHouse.Service.Api;
 using PlayHouse.Service;
-using Serilog;
 using Google.Protobuf.Reflection;
 using Google.Protobuf;
-
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SimpleApi.handler
 {
-    public class SampleApiForRoom : IApiService
+    public class SampleApiForRoom : IApiController
     {
-        private readonly ILogger _log = Log.Logger;
-        private ISystemPanel? _systemPanel;
-        private ISender? _sender;
+     
+        private readonly ILogger<SampleApiForRoom> _log;
+        private ISystemPanel _systemPanel;
+
+        public SampleApiForRoom(ILogger<SampleApiForRoom> log)
+        {
+            _systemPanel = GlobalControlProvider.SystemPanel;
+            _log = log;
+        }
+
+
         private const string _roomSvcId = "room";
         private const string _roomType = "simple";
         private const int _success = 0;
         private const int _fail = 1;
         private const short _roomServiceId = 3;
-
-        public  async Task Init(ISystemPanel systemPanel, ISender sender)
-        {
-            _systemPanel = systemPanel;
-            _sender = sender;
-            await Task.CompletedTask;
-        }
 
         public void Handles(IHandlerRegister register, IBackendHandlerRegister backendRegister)
         {
@@ -44,15 +45,11 @@ namespace SimpleApi.handler
             backendRegister.Add(HelloReq.Descriptor.Index, HelloToApi);
         }
 
-        public IApiService Instance()
-        {
-            return new SampleApiForRoom();
-        }
 
         private async Task CreateStage(Packet packet, IApiSender apiSender)
         {
 
-            _log.Information($"CreateRoom : accountId:{apiSender.AccountId}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(mt => mt.Index == packet.MsgId).Name}");
+            _log.LogInformation($"CreateRoom : accountId:{apiSender.AccountId}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(mt => mt.Index == packet.MsgId).Name}");
 
             var data = CreateRoomReq.Parser.ParseFrom(packet.Data).Data;
             var randRoomServerInfo = _systemPanel!.GetServerInfoByService(_roomServiceId);
@@ -64,7 +61,7 @@ namespace SimpleApi.handler
 
             var createRoomAnswer = CreateRoomAnswer.Parser.ParseFrom(result.CreateStageRes.Data);
 
-            _log.Information($"stageId:{stageId}");
+            _log.LogInformation($"stageId:{stageId}");
 
             if (result.IsSuccess())
             {
@@ -81,7 +78,7 @@ namespace SimpleApi.handler
         }
         public async Task JoinStage(Packet packet, IApiSender apiSender)
         {
-            _log.Information($"joinRoom : accountId:{apiSender.AccountId}, sid:{apiSender.Sid}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(x => x.Index == packet.MsgId).Name}");
+            _log.LogInformation($"joinRoom : accountId:{apiSender.AccountId}, sid:{apiSender.Sid}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(x => x.Index == packet.MsgId).Name}");
 
             var request = JoinRoomReq.Parser.ParseFrom(packet.Data);
             string data = request.Data;
@@ -94,7 +91,7 @@ namespace SimpleApi.handler
 
             if (result.IsSuccess())
             {
-                _log.Information($"stageIdx:{result.StageIndex}");
+                _log.LogInformation($"stageIdx:{result.StageIndex}");
 
                 var joinRoomAnswer = JoinRoomAnswer.Parser.ParseFrom(result.JoinStageRes.Data);
                 apiSender.Reply(new ReplyPacket(new JoinRoomRes{
@@ -110,7 +107,7 @@ namespace SimpleApi.handler
 
         public async Task CreateJoinStage(Packet packet, IApiSender apiSender)
         {
-            _log.Information($"CreateJoinRoomReq : accountId:{apiSender.AccountId},sid:{apiSender.Sid}" +
+            _log.LogInformation($"CreateJoinRoomReq : accountId:{apiSender.AccountId},sid:{apiSender.Sid}" +
                      $"msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
             var request = CreateJoinRoomReq.Parser.ParseFrom(packet.Data);
@@ -135,7 +132,7 @@ namespace SimpleApi.handler
 
         private async Task LeaveRoomNoti(Packet packet, IApiBackendSender backendSender)
         {
-            _log.Information($"leaveRoomNotify : accountId:{backendSender.AccountId}" +
+            _log.LogInformation($"leaveRoomNotify : accountId:{backendSender.AccountId}" +
                      $"msgName:{SimpleReflection.Descriptor.MessageTypes.First(x => x.Index == packet.MsgId).Name}");
 
             var notify = LeaveRoomNotify.Parser.ParseFrom(packet.Data);
@@ -145,7 +142,7 @@ namespace SimpleApi.handler
 
         public async Task HelloToApi(Packet packet, IApiBackendSender backendSender)
         {
-            _log.Information($"helloToApiReq : accountId:{backendSender.AccountId}" +
+            _log.LogInformation($"helloToApiReq : accountId:{backendSender.AccountId}" +
                       $"msgName:{SimpleReflection.Descriptor.MessageTypes.First(m => m.Index == packet.MsgId)?.Name}");
 
             string data = HelloToApiReq.Parser.ParseFrom(packet.Data).Data;
@@ -153,6 +150,9 @@ namespace SimpleApi.handler
             await Task.CompletedTask;
         }
 
-
+        public IApiController Instance()
+        {
+            return GlobalServiceProvider.Instance.GetService<SampleApiForRoom>()!;
+        }
     }
 }
