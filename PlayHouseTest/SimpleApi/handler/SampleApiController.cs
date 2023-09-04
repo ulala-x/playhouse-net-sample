@@ -36,8 +36,10 @@ namespace SimpleApi.handler
         private async Task Authenticate(Packet packet, IApiSender apiSender)
         {
             var req = AuthenticateReq.Parser.ParseFrom(packet.Data);
-            long accountId = req.UserId;
-            _log.LogInformation($"authenticate: accountId:{accountId},token:{req.Token},sid:{apiSender.Sid}");
+            
+            _log.LogInformation($"authenticate: platformUid:{req.PlatformUid},token:{req.Token},sid:{apiSender.Sid}");
+
+            Guid accountId = Guid.NewGuid();
 
             apiSender.Authenticate(accountId);
 

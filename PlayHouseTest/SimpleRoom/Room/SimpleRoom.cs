@@ -18,7 +18,7 @@ namespace SimplePlay.Room
     {
         private ILogger _log = Log.Logger;
         private PacketHandler<SimpleRoom, SimpleUser> _handler = new ();
-        private Dictionary<long,SimpleUser> _userMap = new ();
+        private Dictionary<Guid,SimpleUser> _userMap = new ();
         private int _count;
         private IStageSender _stageSender;
 

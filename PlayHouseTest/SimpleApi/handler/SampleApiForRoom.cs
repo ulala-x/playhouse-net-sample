@@ -55,7 +55,7 @@ namespace SimpleApi.handler
             var randRoomServerInfo = _systemPanel!.GetServerInfoByService(_roomServiceId);
 
             var roomEndpoint = randRoomServerInfo.BindEndpoint();
-            var stageId = _systemPanel.GenerateUUID();
+            var stageId = Guid.NewGuid();
 
             var result = await apiSender.CreateStage(roomEndpoint, _roomType, stageId, new Packet(new CreateRoomAsk() { Data = data}));
 
@@ -67,7 +67,7 @@ namespace SimpleApi.handler
             {
                 apiSender.Reply(new ReplyPacket(new CreateRoomRes() {
                         Data = createRoomAnswer.Data,
-                        StageId = stageId,
+                        StageId = ByteString.CopyFrom(stageId.ToByteArray()),
                         PlayEndpoint = roomEndpoint,
                 }));
             }
@@ -82,7 +82,7 @@ namespace SimpleApi.handler
 
             var request = JoinRoomReq.Parser.ParseFrom(packet.Data);
             string data = request.Data;
-            long stageId = request.RoomId;
+            Guid stageId = new Guid(request.StageId.ToByteArray());
             string roomEndpoint = request.PlayEndpoint;
 
             //new Packet { Data = JoinRoomAsk.Parser.ParseFrom(ByteString.CopyFromUtf8(data)).ToByteString() }
@@ -112,7 +112,7 @@ namespace SimpleApi.handler
 
             var request = CreateJoinRoomReq.Parser.ParseFrom(packet.Data);
             var data = request.Data;
-            var stageId = request.RoomId;
+            Guid stageId = new Guid(request.StageId.ToByteArray());
             var roomEndpoint = request.PlayEndpoint;
             var createPayload = new Packet(new CreateRoomAsk() { Data = data,});
             

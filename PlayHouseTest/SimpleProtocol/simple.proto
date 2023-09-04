@@ -4,12 +4,13 @@ package playhouse.simple.protocol;
 
 
 message AuthenticateReq{
-  int64 user_id = 1;
+  string platform_uid = 1;
   string token = 2;
 }
 
 message AuthenticateRes{
-  string userInfo = 1;
+	string account_id = 1;
+  string userInfo = 3;
 }
 
 message HelloReq{
@@ -32,14 +33,14 @@ message CreateRoomReq{
   string data = 1;
 }
 message CreateRoomRes{
-  int64 stage_id = 1;
+  bytes stage_id = 1;
   string data = 2;
   string playEndpoint = 3;
 }
 message JoinRoomReq{
   string playEndpoint = 1;
-  int64 room_id = 2;
-  int64 user_id = 3;
+  bytes stage_id = 2;
+  bytes account_id = 3;
   string data = 4;
 }
 message JoinRoomRes{
@@ -49,8 +50,8 @@ message JoinRoomRes{
 
 message CreateJoinRoomReq {
   string playEndpoint = 1;
-  int64 room_id = 2;
-  int64 user_id = 3;
+  bytes stage_id = 2;
+  bytes account_id = 3;
   string data = 4;
 }
 message CreateJoinRoomRes {

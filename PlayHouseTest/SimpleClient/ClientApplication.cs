@@ -58,7 +58,7 @@ namespace SimpleClient
             while (!connector.IsConnect())
                 Thread.Yield();
 
-            var response = await connector.RequestToApi(apiServicId, new Packet(new AuthenticateReq() { UserId = 10, Token = "passowrd" }));
+            var response = await connector.RequestToApi(apiServicId, new Packet(new AuthenticateReq() { PlatformUid = "10", Token = "passowrd" }));
             
             if (!response.IsSuccess())
             {
@@ -89,7 +89,7 @@ namespace SimpleClient
 
             _log.Information("Recconected");
 
-            response = await connector.RequestToApi(apiServicId, new Packet(new AuthenticateReq() { UserId = 10, Token = "passowrd" }));
+            response = await connector.RequestToApi(apiServicId, new Packet(new AuthenticateReq() { PlatformUid = "10", Token = "passowrd" }));
 
             if (!response.IsSuccess())
             {
@@ -106,12 +106,12 @@ namespace SimpleClient
             }
 
             var createRoomRes = CreateRoomRes.Parser.ParseFrom(response.Data);
-            var roomId = createRoomRes.StageId;
+            var stageId = createRoomRes.StageId;
             var playEndpoint = createRoomRes.PlayEndpoint;
 
-            _log.Information($"CreateRoom: PlayEndpoint:{playEndpoint},StageId:{roomId}");
+            _log.Information($"CreateRoom: PlayEndpoint:{playEndpoint},StageId:{stageId}");
 
-            response = await connector.RequestToApi(apiServicId, new Packet(new JoinRoomReq() { PlayEndpoint = playEndpoint, RoomId = roomId, Data = "success 2" }));
+            response = await connector.RequestToApi(apiServicId, new Packet(new JoinRoomReq() { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 2" }));
 
             if (!response.IsSuccess())
             {
@@ -131,7 +131,7 @@ namespace SimpleClient
                 Environment.Exit(0);
             }
 
-            response = await connector.RequestToApi(apiServicId, new Packet(new CreateJoinRoomReq() { PlayEndpoint = playEndpoint, RoomId = roomId, Data = "success 4" }));
+            response = await connector.RequestToApi(apiServicId, new Packet(new CreateJoinRoomReq() { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 4" }));
             if (!response.IsSuccess())
             {
                 _log.Error($"request is not success , error:{response.ErrorCode}");

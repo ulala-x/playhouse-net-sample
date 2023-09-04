@@ -12,7 +12,7 @@ namespace SimpleApi.handler
     {
         private readonly ILogger _logger = Log.Logger;
 
-        public void OnDisconnect(long accountId)
+        public void OnDisconnect(Guid accountId)
         {
             _logger.Information($"OnDisconnect {accountId}");
         }
