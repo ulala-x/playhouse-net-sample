@@ -17,7 +17,7 @@ namespace SimpleSession
             {
                 const int redisPort = 6379;
 
-                short sessionSvcId = 1;
+                ushort sessionSvcId = 1;
                 short apiSvcId = 2;
 
                 var commonOption = new CommonOption

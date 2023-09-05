@@ -49,8 +49,8 @@ namespace SimpleClient
                 _log.Information("onDisconnect");
             };
 
-            short apiServicId = 2;
-            short playServiceId = 3;
+            ushort apiServicId = 2;
+            ushort playServiceId = 3;
 
             connector.Start();
             connector.Connect("127.0.0.1", 30114);

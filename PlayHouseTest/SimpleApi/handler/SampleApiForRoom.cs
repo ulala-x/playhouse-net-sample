@@ -33,7 +33,7 @@ namespace SimpleApi.handler
         private const string _roomType = "simple";
         private const int _success = 0;
         private const int _fail = 1;
-        private const short _roomServiceId = 3;
+        private const ushort _roomServiceId = 3;
 
         public void Handles(IHandlerRegister register, IBackendHandlerRegister backendRegister)
         {
