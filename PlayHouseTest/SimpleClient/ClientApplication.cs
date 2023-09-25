@@ -49,8 +49,8 @@ namespace SimpleClient
                 _log.Information("onDisconnect");
             };
 
-            ushort apiServicId = 2;
-            ushort playServiceId = 3;
+            ushort apiServicId = 1;
+            ushort playServiceId = 2;
 
             connector.Start();
             connector.Connect("127.0.0.1", 30114);
@@ -138,7 +138,7 @@ namespace SimpleClient
                 Environment.Exit(0);
             }
 
-            connector.SendToApi(playServiceId, new Packet(new SendMsg() { Message = "hi!" }));
+            connector.SendToApi(apiServicId, new Packet(new SendMsg() { Message = "hi!" }));
 
             await Task.Delay(TimeSpan.FromSeconds(1));
 

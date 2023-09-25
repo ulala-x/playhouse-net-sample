@@ -23,7 +23,7 @@ namespace SimplePlay
                 var commonOption = new CommonOption()
                 {
                     Port = 30570,
-                    ServiceId = 3,
+                    ServiceId = 2,
                     RedisPort = redisPort,
                     ServerSystem = (systemPanel, sender) => new PlaySystem(systemPanel, sender),
                     RequestTimeoutSec = 0,

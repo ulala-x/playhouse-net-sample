@@ -40,7 +40,7 @@ namespace SimpleApi
                 {
                     ServerSystem = (systemPanel, baseSender) => new ApiSystem(systemPanel, baseSender),
                     Port = 30470,
-                    ServiceId = 2,
+                    ServiceId = 1,
                     RedisPort = 6379,
                     RequestTimeoutSec = 0,
                 };
