@@ -116,7 +116,7 @@ namespace SimplePlay.Room
             List<Task<ReplyPacket>> requests = new List<Task<ReplyPacket>>();
             foreach (var item in _userMap.Values)
             {
-                requests.Add(item.ActorSender.AsyncToApi(new Packet(new HelloReq() { Message = "Hello" })));
+                requests.Add(item.ActorSender.AsyncToApi(new Packet(new HelloToApiReq() { Data = "Hello" })));
             }
 
             ReplyPacket[] replys = await Task.WhenAll(requests);
@@ -124,8 +124,8 @@ namespace SimplePlay.Room
             
             foreach (var reply in replys)
             {
-                var helloRes = HelloRes.Parser.ParseFrom(reply.Data);    
-                _log.Information($"reply : {helloRes.Message}");
+                var helloRes = HelloToApiReq.Parser.ParseFrom(reply.Data);    
+                _log.Information($"reply : {helloRes.Data}");
             }
 
         }

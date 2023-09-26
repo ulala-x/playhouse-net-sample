@@ -42,7 +42,7 @@ namespace SimpleApi.handler
             register.Add(CreateJoinRoomReq.Descriptor.Index, CreateJoinStage);
 
             backendRegister.Add(LeaveRoomNotify.Descriptor.Index, LeaveRoomNoti);
-            backendRegister.Add(HelloReq.Descriptor.Index, HelloToApi);
+            backendRegister.Add(HelloToApiReq.Descriptor.Index, HelloToApi);
         }
 
 

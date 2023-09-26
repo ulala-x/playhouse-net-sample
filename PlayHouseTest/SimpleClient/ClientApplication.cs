@@ -138,7 +138,7 @@ namespace SimpleClient
                 Environment.Exit(0);
             }
 
-            connector.SendToApi(apiServicId, new Packet(new SendMsg() { Message = "hi!" }));
+            connector.SendToStage(playServiceId, stageIndex, new Packet(new ChatMsg() { Data = "hi!" }));
 
             await Task.Delay(TimeSpan.FromSeconds(1));
 
