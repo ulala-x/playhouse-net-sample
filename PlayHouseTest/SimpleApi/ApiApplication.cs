@@ -39,9 +39,9 @@ namespace SimpleApi
                 var commonOption = new CommonOption
                 {
                     ServerSystem = (systemPanel, baseSender) => new ApiSystem(systemPanel, baseSender),
-                    Port = 30470,
+                    Port = 10470,
                     ServiceId = 1,
-                    RedisPort = 6379,
+                    RedisPort = 16379,
                     RequestTimeoutSec = 0,
                 };
                 var apiOption = new ApiOption

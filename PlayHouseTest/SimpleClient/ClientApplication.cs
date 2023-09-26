@@ -53,7 +53,7 @@ namespace SimpleClient
             ushort playServiceId = 2;
 
             connector.Start();
-            connector.Connect("127.0.0.1", 30114);
+            connector.Connect("127.0.0.1", 10114);
 
             while (!connector.IsConnect())
                 Thread.Yield();
@@ -80,7 +80,7 @@ namespace SimpleClient
             Thread.Sleep(1000);
 
 
-            connector.Connect("127.0.0.1", 30114);
+            connector.Connect("127.0.0.1", 10114);
 
             _log.Information("start Recconect");
 

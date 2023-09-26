@@ -19,10 +19,10 @@ namespace SimplePlay
         {
             try
             {
-                var redisPort = 6379;
+                var redisPort = 16379;
                 var commonOption = new CommonOption()
                 {
-                    Port = 30570,
+                    Port = 10570,
                     ServiceId = 2,
                     RedisPort = redisPort,
                     ServerSystem = (systemPanel, sender) => new PlaySystem(systemPanel, sender),

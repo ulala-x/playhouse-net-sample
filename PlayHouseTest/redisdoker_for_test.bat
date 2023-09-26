@@ -1,0 +1,1 @@
+sudo docker run -p 16379:6379 redis

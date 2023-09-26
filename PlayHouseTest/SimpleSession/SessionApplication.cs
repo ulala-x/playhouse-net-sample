@@ -15,14 +15,14 @@ namespace SimpleSession
         {
             try
             {
-                const int redisPort = 6379;
+                const int redisPort = 16379;
 
                 ushort sessionSvcId = 0;
                 short apiSvcId = 1;
 
                 var commonOption = new CommonOption
                 {
-                    Port = 30370,
+                    Port = 10370,
                     ServiceId = sessionSvcId,
                     RedisPort = redisPort,
                     ServerSystem = (systemPanel, sender) => new SessionSystem(systemPanel, sender),
@@ -31,7 +31,7 @@ namespace SimpleSession
 
                 var sessionOption = new SessionOption
                 {
-                    SessionPort = 30114,
+                    SessionPort = 10114,
                     ClientSessionIdleTimeout = 0,
                     UseWebSocket = false,
                     Urls = new List<string> { $"{apiSvcId}:{AuthenticateReq.Descriptor.Index}" }
