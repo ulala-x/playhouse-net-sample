@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using PlayHouse.Service.Api;
 
 namespace SimpleApi.handler
 {
@@ -60,8 +61,15 @@ namespace SimpleApi.handler
         {
             var recv = SendMsg.Parser.ParseFrom(packet.Data);
             _log.LogInformation($"message:{recv.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
-            apiSender.SendToClient(new Packet(new SendMsg() { Message = recv.Message}));
+
+            SendTestApiSenderContext(recv.Message);
+            //apiSender.SendToClient(new Packet(new SendMsg() { Message = recv.Message}));
             await Task.CompletedTask;
+        }
+
+        private void SendTestApiSenderContext(string message)
+        {
+            ApiSenderContext.Get()!.SendToClient(new Packet(new SendMsg() { Message = message}));
         }
 
         private async Task CloseSessionMsg(Packet packet, IApiSender apiSender)
