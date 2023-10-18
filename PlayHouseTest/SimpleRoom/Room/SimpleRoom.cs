@@ -1,17 +1,8 @@
-﻿using NetMQ.Sockets;
-using Playhouse.Protocol;
-using Playhouse.Simple.Protocol;
-using PlayHouse.Production;
+﻿using PlayHouse.Production;
 using PlayHouse.Production.Play;
 using Serilog;
+using Simple;
 using SimplePlay.Room.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace SimplePlay.Room
 {
     internal class SimpleRoom : IStage

@@ -1,9 +1,8 @@
-﻿using Playhouse.Simple.Protocol;
-using PlayHouse.Communicator;
-using PlayHouse.Production;
+﻿using PlayHouse.Production;
 using PlayHouse.Production.Session;
 using PlayHouse.Service.Session;
 using Serilog;
+using Simple;
 
 namespace SimpleSession
 {

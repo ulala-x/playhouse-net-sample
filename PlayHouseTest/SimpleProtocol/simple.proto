@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package playhouse.simple.protocol;
+package Simple;
 
 
 message AuthenticateReq{
@@ -63,7 +63,14 @@ message LeaveRoomNotify{
   string data = 1;
   string sessionEndpoint = 2;
   int32 sid = 3;
+}
 
+message TestTimeoutReq
+{
+}
+
+message TestNotRegisterReq
+{
 }
 
 //////////////////for room/////////////
