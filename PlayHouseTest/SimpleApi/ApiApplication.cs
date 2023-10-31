@@ -1,41 +1,42 @@
-﻿using PlayHouse.Communicator;
-using PlayHouse.Service.Api;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PlayHouse.Service.Api;
 using Serilog;
 using SimpleApi.handler;
 using PlayHouse.Production;
 using PlayHouse.Production.Api;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ILogger = Serilog.ILogger;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using SimpleConfigure;
 
 namespace SimpleApi
 {
     public class ApiApplication 
     {
-        private readonly Serilog.ILogger _log = Log.Logger;
-        private IServiceCollection _services { get; } = new ServiceCollection();
+        private readonly ILogger _log = Log.Logger;
+        private IServiceCollection Services { get; } = new ServiceCollection();
 
         public void RegisterService()
         {
-            //_services.AddLogging
-            //var loggerFactory = new LoggerFactory().AddSerilog(Log.Logger,dispose:true);
-            _services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
-            //_services.AddSingleton<ILoggerFactory>(loggerFactory);
-            _services.AddTransient<SampleApiController>();
-            _services.AddTransient<SampleApiForRoom>();
+            // Services.AddLogging(
+            //     builder =>
+            //     {
+            //         builder.AddSerilog(Log.Logger, dispose: true);
+            //         //builder.SetMinimumLevel(LogLevel.Information);
+            //     });
+            Services.AddTransient<SampleApiController>();
+            Services.AddTransient<SampleApiForRoom>();
 
-            GlobalServiceProvider.Instance = _services.BuildServiceProvider();
+            GlobalServiceProvider.Instance = Services.BuildServiceProvider();
         }
 
         public void Run()
         {
             try
             {
-                _log.Debug("api start");
+                LOG.SetLogger(new SimpleLogger(),PlayHouse.Production.LogLevel.Trace);
+                
+                _log.Information("api start");
                 var commonOption = new CommonOption
                 {
                     ServerSystem = (systemPanel, baseSender) => new ApiSystem(systemPanel, baseSender),
@@ -53,9 +54,9 @@ namespace SimpleApi
 
                 AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
                 {
-                    Log.Logger.Information("*** shutting down Api server since process is shutting down");
+                    _log.Information("*** shutting down Api server since process is shutting down");
                     apiServer.Stop();
-                    Log.Logger.Information("*** server shut down");
+                    _log.Information("*** server shut down");
                     Thread.Sleep(1000);
                 };
 

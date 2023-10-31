@@ -3,6 +3,7 @@ using PlayHouse.Production.Play;
 using PlayHouse.Service.Api;
 using PlayHouse.Service.Play;
 using Serilog;
+using SimpleConfigure;
 using SimplePlay.Room;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,7 @@ namespace SimplePlay
                     (actorSender) => new SimpleUser(actorSender)
                 );
 
+                LOG.SetLogger(new SimpleLogger(),LogLevel.Info);
                 var playServer = new PlayServer(commonOption, playOption);
                 playServer.Start();
 

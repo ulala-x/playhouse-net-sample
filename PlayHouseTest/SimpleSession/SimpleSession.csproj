@@ -9,8 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\playhouse-net\PlayHouse\PlayHouse\PlayHouse.csproj" />
-    <ProjectReference Include="..\PlayHouseTest\PlayHouseTest.csproj" />
-    <ProjectReference Include="..\SimpleProtocol\SimpleProtocol.csproj" />
+    <ProjectReference Include="..\SimpleConfigure\SimpleConfigure.csproj" />
   </ItemGroup>
 
 </Project>

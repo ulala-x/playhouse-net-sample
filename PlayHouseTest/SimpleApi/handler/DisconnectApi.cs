@@ -1,10 +1,6 @@
 ﻿using PlayHouse.Production.Api;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace SimpleApi.handler
 {
@@ -14,7 +10,7 @@ namespace SimpleApi.handler
 
         public void OnDisconnect(Guid accountId)
         {
-            _logger.Information($"OnDisconnect {accountId}");
+            _logger.Debug("OnDisconnect {0}",accountId);
         }
     }
 }

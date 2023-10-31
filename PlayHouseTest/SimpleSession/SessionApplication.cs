@@ -3,6 +3,7 @@ using PlayHouse.Production.Session;
 using PlayHouse.Service.Session;
 using Serilog;
 using Simple;
+using SimpleConfigure;
 
 namespace SimpleSession
 {
@@ -36,6 +37,7 @@ namespace SimpleSession
                     Urls = new List<string> { $"{apiSvcId}:{AuthenticateReq.Descriptor.Index}" }
                 };
 
+                LOG.SetLogger(new SimpleLogger(),LogLevel.Trace);
                 var sessionServer = new SessionServer(commonOption, sessionOption);
                 sessionServer.Start();
 

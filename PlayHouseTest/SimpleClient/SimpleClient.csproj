@@ -8,12 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="2.12.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\playhouse-connector-net\playhouse-connector-net\playhouse-connector-net\PlayHouseConnector.csproj" />
+    <ProjectReference Include="..\SimpleConfigure\SimpleConfigure.csproj" />
     <ProjectReference Include="..\SimpleProtocol\SimpleProtocol.csproj" />
   </ItemGroup>
 
