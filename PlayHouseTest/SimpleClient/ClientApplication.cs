@@ -13,7 +13,8 @@ namespace SimpleClient
         
         public async Task RunAsync()
         {
-            var connector = new Connector(new ConnectorConfig() {RequestTimeout= 3,EnableLoggingResponseTime = true,Host="127.0.0.1",Port=10114});
+            var connector = new Connector();
+            connector.Init(new ConnectorConfig() { RequestTimeout = 3, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114 });
 
             connector.OnReceive += (serviceId, packet) =>
             {
