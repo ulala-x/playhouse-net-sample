@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using PlayHouse.Utils;
 using Serilog;
+using SimpleConfigure;
 
 namespace SimpleClient
 {
@@ -15,15 +16,17 @@ namespace SimpleClient
                 File.Delete(logFilePath);
             }
 
+            LoggerConfigure.SetLogger(new SimpleLogger(),LogLevel.Debug);
 
             // Serilog 구성
             Log.Logger = new LoggerConfiguration()
-                        .MinimumLevel.Debug()
+                        .MinimumLevel.Verbose()
                         .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information) // 콘솔에는 정보 레벨 이상만 로그
-                         .WriteTo.Async(a => a.File(logFilePath,shared:true, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug)) // 파일에는 디버그 레벨 이상 로그
+                         .WriteTo.Async(a => a.File(logFilePath,shared:true, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose))
                         .CreateLogger();
 
-            Task[] tasks = new Task[100];
+            Task[] tasks = new Task[3000];
+            
 
             for (int i = 0; i < tasks.Length; i++)
             {

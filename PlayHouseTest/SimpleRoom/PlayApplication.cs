@@ -20,6 +20,7 @@ namespace SimplePlay
         {
             try
             {
+
                 var redisPort = 16379;
                 var commonOption = new CommonOption()
                 {
@@ -38,7 +39,7 @@ namespace SimplePlay
                     (actorSender) => new SimpleUser(actorSender)
                 );
 
-                LOG.SetLogger(new SimpleLogger(),LogLevel.Info);
+                
                 var playServer = new PlayServer(commonOption, playOption);
                 playServer.Start();
 

@@ -34,7 +34,7 @@ namespace SimpleApi
         {
             try
             {
-                LOG.SetLogger(new SimpleLogger(),PlayHouse.Production.LogLevel.Trace);
+                
                 
                 _log.Information("api start");
                 var commonOption = new CommonOption

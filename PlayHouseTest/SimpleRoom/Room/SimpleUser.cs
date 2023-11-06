@@ -21,13 +21,13 @@ namespace SimplePlay.Room
 
         public async Task OnCreate()
         {
-            _log.Information($"OnCreate {_sender.AccountId}");
+            _log.Debug($"OnCreate - [accountId:{_sender.AccountId()}]");
             await Task.CompletedTask;
         }
 
         public async Task OnDestroy()
         {
-            _log.Information($"OnDestroy {_sender.AccountId}");
+            _log.Debug($"OnDestroy - [accountId:{_sender.AccountId()}]");
             await Task.CompletedTask;
         }
 

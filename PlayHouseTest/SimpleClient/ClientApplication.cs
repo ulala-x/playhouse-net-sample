@@ -1,175 +1,183 @@
-﻿using PlayHouseConnector;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PlayHouse.Utils;
+using PlayHouseConnector;
 using Simple;
+using Packet = PlayHouseConnector.Packet;
 
 namespace SimpleClient
 {
     internal class ClientApplication
     {
-        private ILogger _log = Log.Logger;
-        private ushort _apiServicId = 1;
-        private ushort _playServiceId = 2;
-        Stopwatch _stopwatch = new Stopwatch();
-
+        private readonly ushort _apiSvcId = 1;
+        private readonly ushort _playSvcId = 2;
+        private readonly LOG<ClientApplication> _log = new();
+        
         public async Task RunAsync()
         {
-            var connector = new Connector(new ConnectorConfig() {ReqestTimeout= 5 });
+            var connector = new Connector(new ConnectorConfig() {RequestTimeout= 3,EnableLoggingResponseTime = true,Host="127.0.0.1",Port=10114});
 
-            connector.OnReceive += (serviceId, stageIndex, packet) =>
+            connector.OnReceive += (serviceId, packet) =>
             {
-                _log.Information($"stage message onReceive: [serviceId:{serviceId},stageIndex:{stageIndex},msgId:{packet.MsgId}]");
+               // _log.Information($"message onReceive - [serviceId:{serviceId},msgId:{packet.MsgId}]");
 
-                if (serviceId == _apiServicId)
+                if (serviceId == _apiSvcId)
                 {
                     if(packet.MsgId == SendMsg.Descriptor.Index)
                     {
-                        _log.Information($"api SendMsg message : [msgId:{packet.MsgId}, message:{ChatMsg.Parser.ParseFrom(packet.Data).Data}]");
+                        _log.Debug(()=>$"api SendMsg message - [msgId:{packet.MsgId}, message:{SendMsg.Parser.ParseFrom(packet.Data).Message}]");
                     }    
                 }
-                else if (serviceId == _playServiceId)
+                else if (serviceId == _playSvcId)
                 {
                     if(packet.MsgId == ChatMsg.Descriptor.Index) 
                     {
-                        _log.Information($"stage chat msg: [msgId:{packet.MsgId},data:{ChatMsg.Parser.ParseFrom(packet.Data).Data}]");
+                        _log.Debug(()=>$"stage chat msg -  [msgId:{packet.MsgId},data:{ChatMsg.Parser.ParseFrom(packet.Data).Data}]");
                     }
                 }
             };
 
-            connector.OnConnect += () =>
+            connector.OnDisconnect += () =>
             {
-                _log.Information("onConnect");
+                _log.Info(()=>"onDisconnect");
             };
 
-            connector.OnDiconnect += () =>
+            Thread thread = new Thread(() =>
             {
-                _log.Information("onDisconnect");
-            };
-
-            connector.Start();
-            await connector.ConnectAsync("127.0.0.1", 10114);
-
-            var response = await connector.RequestToApi(_apiServicId, new Packet(new AuthenticateReq() { PlatformUid = Guid.NewGuid().ToString(), Token = "passowrd" }));
-            
-            if (!response.IsSuccess())
-            {
-                _log.Error($"Authenticate is not success , error:{response.ErrorCode}");
-                //Environment.Exit(0);
-                
-            }
-            var authenticateRes = AuthenticateRes.Parser.ParseFrom(response.Data);
-            
-            //_log.Debug($"authenticate ok,auth userInfo:{authenticateRes.UserInfo}");
-            
-            for (int i = 0; i < 100; i++)
-            {
-                if (false == connector.IsConnect())
+                while (true)
                 {
-                    return;
+                    connector.MainThreadAction();
+                    Thread.Sleep(10);    
                 }
-                
-                _stopwatch.Reset();
-                _stopwatch.Start();
+            });
+            thread.Start();
+            //_timer = new Timer((arg) => { connector.MainThreadAction();}, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(10));
             
-                response = await connector.RequestToApi(_apiServicId, new Packet(new HelloReq() { Message = "hi!" }));
+            bool result = await connector.ConnectAsync();
+            String accountId = Guid.NewGuid().ToString();
+            _log.Info(()=>$"onConnect - [accountId:{accountId},result:{result}]");
 
-                if (!response.IsSuccess())
+            try
+            {
+                var response = await connector.RequestAsync(_apiSvcId,
+                    new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
+
+                var authenticateRes = AuthenticateRes.Parser.ParseFrom(response.Data);
+                _log.Debug(()=>$"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
+
+                 int offSet = 2;
+                
+                 for (int i = offSet; i < offSet+10; i++)
+                 {
+                     if (false == connector.IsConnect())
+                     {
+                         return;
+                     }
+                
+                     var helloRes = await connector.RequestAsync(_apiSvcId, new Packet(new HelloReq() { Message = "hi!" }));
+                
+                     // _log.Debug(()=>
+                     //     $"response message - [accountId:{accountId},count:{i},message:{HelloRes.Parser.ParseFrom(helloRes.Data).Message}]");
+                 }
+                
+                
+                connector.Send(_apiSvcId, new Packet(new CloseSessionMsg()));
+                
+                await Task.Delay(1000);
+            
+            
+                await connector.ConnectAsync();
+                _log.Info(()=>"Reconnect");
+                Thread.Sleep(TimeSpan.FromSeconds(2));
+                
+                 response = await connector.RequestAsync(_apiSvcId, new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
+                
+                 authenticateRes = AuthenticateRes.Parser.ParseFrom(response.Data);
+                 // _log.Info(()=>$"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
+                
+                for (int i = 0; i < 10; ++i)
                 {
-                    _log.Error($"request:{HelloReq.Descriptor.Name},errorCode:{response.ErrorCode}");
-                    return;
+                    response = await connector.RequestAsync(_apiSvcId,
+                        new Packet(new CreateRoomReq() { Data = "success 1" }));
+                
+                    var createRoomRes = CreateRoomRes.Parser.ParseFrom(response.Data);
+                    var stageId = createRoomRes.StageId;
+                    var playEndpoint = createRoomRes.PlayEndpoint;
+                
+                    // _log.Debug(()=>
+                    //     $"CreateRoom - [playEndpoint:{playEndpoint},stageId:{stageId},data:{createRoomRes.Data}]");
+                
+                    response = await connector.RequestAsync(_apiSvcId,
+                        new Packet(new JoinRoomReq()
+                            { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 2" }));
+                
+                
+                    var joinRoomRes = JoinRoomRes.Parser.ParseFrom(response.Data);
+                    // _log.Debug(()=>
+                    //     $"JoinRoomRes - [stageIndex:{joinRoomRes.StageIdx},data:{joinRoomRes.Data}]");
+                
+                    response = await connector.RequestAsync(_playSvcId,
+                        new Packet(new LeaveRoomReq() { Data = "success 3" }));
+                    var leaveRoomRes = LeaveRoomRes.Parser.ParseFrom(response.Data);
+                
+                    // _log.Debug(()=>
+                    //     $"LeaveRoomRes - [data:{leaveRoomRes.Data}]");
+                
+                    //}
+                    // var playEndpoint = "tcp://10.12.20.59:10570";
+                    // var stageId = ByteString.CopyFrom(Guid.NewGuid().ToByteArray());
+                
+                    response = await connector.RequestAsync(_apiSvcId,
+                        new Packet(new CreateJoinRoomReq()
+                            { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 4" }));
+                    
+                    var createJoinRoomRes = CreateJoinRoomRes.Parser.ParseFrom(response.Data);
+                
+                    // _log.Debug(()=>
+                    //     $"createJoinRoomRes - [stageIndex:{createJoinRoomRes.StageIdx},data:{createJoinRoomRes.Data}]");
+                    
+                    connector.Send(_playSvcId, new Packet(new ChatMsg() { Data = "hi!" }));
+                    connector.Send(_apiSvcId, new Packet(new SendMsg(){Message = "hello!!"} ));
+                    
+                    response = await connector.RequestAsync(_playSvcId,
+                        new Packet(new LeaveRoomReq() { Data = "success 5" }));
+                    
+                    var createJoinRoomLeaveRes = LeaveRoomRes.Parser.ParseFrom(response.Data);
+                    // _log.Debug(()=>
+                    //     $"createJoinRoomLeaveRes - [data:{createJoinRoomLeaveRes.Data}]");
                 }
-                
-                _stopwatch.Stop();
-                
-                _log.Debug($"errorCode:{response.ErrorCode},response message : {HelloRes.Parser.ParseFrom(response.Data).Message}, {_stopwatch.ElapsedMilliseconds} ms");
+                //
+                // try
+                // {
+                //     await connector.RequestAsync(_apiSvcId, new Packet(new TestNotRegisterReq() ));
+                // }
+                // catch (PlayConnectorException ex)
+                // {
+                //     _log.Error(()=>$"Request Error - [accountId:{accountId},{ex.Message}]");
+                // }
+                //
+                // try
+                // {
+                //     await connector.RequestAsync(_apiSvcId, new Packet(new TestTimeoutReq() ));
+                // }
+                // catch (PlayConnectorException ex)
+                // {
+                //     _log.Error(()=>$"Request Error - [accountId:{accountId},{ex.Message}]");
+                // }
+            
+              
             }
-            
-            
-            
-
-
-            // connector.SendToApi(_apiServicId, new Packet(new CloseSessionMsg()));
-            //
-            // await Task.Delay(1000);
-            //
-            //
-            // await connector.ConnectAsync("127.0.0.1", 10114);
-            //
-            //
-            // _log.Information("Reconnect");
-
-            // response = await connector.RequestToApi(_apiServicId, new Packet(new AuthenticateReq() { PlatformUid = "10", Token = "passowrd" }));
-            //
-            // if (!response.IsSuccess())
-            // {
-            //     _log.Error($"request is not success , error:{response.ErrorCode}");
-            //     //Environment.Exit(0);
-            // }
-
-            // response = await connector.RequestToApi(_apiServicId, new Packet(new CreateRoomReq() { Data = "success 1" }));
-            //
-            // if (!response.IsSuccess())
-            // {
-            //     _log.Error($"request is not success , error:{response.ErrorCode}");
-            //     Environment.Exit(0);
-            // }
-            // //
-            // var createRoomRes = CreateRoomRes.Parser.ParseFrom(response.Data);
-            // var stageId = createRoomRes.StageId;
-            // var playEndpoint = createRoomRes.PlayEndpoint;
-            //
-            // _log.Information($"CreateRoom: PlayEndpoint:{playEndpoint},StageId:{stageId}");
-            // //
-            // response = await connector.RequestToApi(_apiServicId, new Packet(new JoinRoomReq() { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 2" }));
-            //
-            // if (!response.IsSuccess())
-            // {
-            //     _log.Error($"request is not success , error:{response.ErrorCode}");
-            //     Environment.Exit(0);
-            // }
-            //
-            // var joinRoomRes = JoinRoomRes.Parser.ParseFrom(response.Data);
-            // var stageIndex = joinRoomRes.StageIdx;
-            //
-            // _log.Information($"JoinRoomRes: stageIndex:{stageIndex}");
-            //
-            // response = await connector.RequestToStage(_playServiceId, stageIndex, new Packet(new LeaveRoomReq() { Data = "success 3" }));
-            // if (!response.IsSuccess())
-            // {
-            //     _log.Error($"request is not success , error:{response.ErrorCode}");
-            //     Environment.Exit(0);
-            // }
-            // //
-            // response = await connector.RequestToApi(_apiServicId, new Packet(new CreateJoinRoomReq() { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 4" }));
-            // if (!response.IsSuccess())
-            // {
-            //     _log.Error($"request is not success , error:{response.ErrorCode}");
-            //     Environment.Exit(0);
-            // }
-            //connector.SendToStage(_playServiceId, stageIndex, new Packet(new ChatMsg() { Data = "hi!" }));
-            //connector.SendToApi(_apiServicId, new Packet(new SendMsg(){Message = "hello!!"} ));
-            // response = await connector.RequestToApi(_apiServicId, new Packet(new TestNotRegisterReq() ));
-            //  if (!response.IsSuccess())
-            //  {
-            //      _log.Error($"request is not success , error:{response.ErrorCode}");
-            //  }
-            //  //
-            // response = await connector.RequestToApi(_apiServicId, new Packet(new TestTimeoutReq() ));
-            //
-            //  if (!response.IsSuccess())
-            //  {
-            //      _log.Error($"request is not success , error:{response.ErrorCode}");
-            //  }
-            //  
-            //
-            await Task.Delay(TimeSpan.FromSeconds(10));
-            _log.Information("finish");
+            catch (PlayConnectorException ex)
+            {
+                _log.Error(()=>$"Request Error - [accountId:{accountId},ex:{ex.Message}]");
+            }
+            catch (Exception ex)
+            {
+                _log.Error(()=>$"Exception- [accountId:{accountId},ex:{ex}]");
+            }
+              
+            //Environment.Exit(0);
+            await Task.Delay(TimeSpan.FromSeconds(5));
+            _log.Info(()=>"finish");
+            //await _timer.DisposeAsync();
             //Environment.Exit(0);
 
         }

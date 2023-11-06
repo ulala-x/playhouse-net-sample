@@ -2,110 +2,129 @@ syntax = "proto3";
 
 package Simple;
 
-
+//msgId = 0
 message AuthenticateReq{
   string platform_uid = 1;
   string token = 2;
 }
 
+//msgId = 1
 message AuthenticateRes{
 	string account_id = 1;
   string userInfo = 3;
 }
 
+//msgId = 2
 message HelloReq{
   string message = 1;
 }
 
+//msgId = 3
 message HelloRes{
   string message = 1;
 }
 
+//msgId = 4
 message SendMsg{
   string message = 1;
 }
 
+//msgId = 5
 message CloseSessionMsg{
 }
 
 /////////////
+//msgId = 6
 message CreateRoomReq{
   string data = 1;
 }
+//msgId = 7
 message CreateRoomRes{
   bytes stage_id = 1;
   string data = 2;
   string playEndpoint = 3;
 }
+//msgId = 8
 message JoinRoomReq{
   string playEndpoint = 1;
   bytes stage_id = 2;
   bytes account_id = 3;
   string data = 4;
 }
+//msgId = 9
 message JoinRoomRes{
   int32 stage_idx = 1;
   string data = 2;
 }
-
+//msgId = 10
 message CreateJoinRoomReq {
   string playEndpoint = 1;
   bytes stage_id = 2;
   bytes account_id = 3;
   string data = 4;
 }
+//msgId = 11
 message CreateJoinRoomRes {
   int32 stage_idx = 1;
   string data = 2;
 }
-
+//msgId = 12
 message LeaveRoomNotify{
   string data = 1;
   string sessionEndpoint = 2;
   int32 sid = 3;
 }
-
+//msgId = 13
 message TestTimeoutReq
 {
 }
-
+//msgId = 14
 message TestNotRegisterReq
 {
 }
 
 //////////////////for room/////////////
+//msgId = 15
 message CreateRoomAsk{
   string data = 1;
 }
+//msgId = 16
 message CreateRoomAnswer{
   string data = 1;
 }
+//msgId = 17
 message JoinRoomAsk{
   string data = 1;
 }
+//msgId = 18
 message JoinRoomAnswer{
   string data = 1;
 }
-
+//msgId = 19
 message CreateJoinRoomAsk{
   string data = 1;
 }
+//msgId = 20
 message CreateJoinRoomAnswer{
   string data = 1;
 }
+//msgId = 21
 message LeaveRoomReq{
   string data = 1;
 }
+//msgId = 22
 message LeaveRoomRes{
   string data = 1;
 }
+//msgId = 23
 message ChatMsg {
   string data = 1;
 }
-
+//msgId = 24
 message HelloToApiReq {
   string data = 1;
 }
+//msgId = 25
 message HelloToApiRes{
   string data = 1;
 }

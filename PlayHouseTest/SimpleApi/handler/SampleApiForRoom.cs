@@ -2,15 +2,15 @@
 using PlayHouse.Production;
 using Google.Protobuf;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 using Simple;
+using PlayHouse.Utils;
 
 namespace SimpleApi.handler
 {
     public class SampleApiForRoom : IApiController
     {
-     
-        private readonly ILogger _log = Log.Logger;
+
+        private LOG<SampleApiForRoom> _log = new();
         private readonly ISystemPanel _systemPanel;
 
         public SampleApiForRoom()
@@ -38,9 +38,8 @@ namespace SimpleApi.handler
         private async Task CreateStage(Packet packet, IApiSender apiSender)
         {
 
-            _log.Debug(
-                "CreateRoom : accountId:{0}, msgName:{1}",
-                apiSender.AccountId,SimpleReflection.Descriptor.MessageTypes.First(mt => mt.Index == packet.MsgId).Name
+            _log.Debug(()=>
+                $"CreateRoom - accountId:{apiSender.AccountId}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(mt => mt.Index == packet.MsgId).Name}"
             );
 
             var data = CreateRoomReq.Parser.ParseFrom(packet.Data).Data;
@@ -53,7 +52,7 @@ namespace SimpleApi.handler
 
             var createRoomAnswer = CreateRoomAnswer.Parser.ParseFrom(result.CreateStageRes.Data);
 
-            _log.Debug("stageId:{0}",stageId);
+            _log.Debug(() => $"stageId:{stageId}");
 
             if (result.IsSuccess())
             {
@@ -71,9 +70,7 @@ namespace SimpleApi.handler
 
         private async Task JoinStage(Packet packet, IApiSender apiSender)
         {
-            _log.Debug("joinRoom : accountId:{0}, sid:{1}, msgName:{2}", 
-                apiSender.AccountId,apiSender.Sid,SimpleReflection.Descriptor.MessageTypes.First(x => x.Index == packet.MsgId).Name
-            );
+            _log.Debug(() => $"joinRoom - accountId:{apiSender.AccountId}, sid:{apiSender.Sid}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(x => x.Index == packet.MsgId).Name}");
 
             var request = JoinRoomReq.Parser.ParseFrom(packet.Data);
             string data = request.Data;
@@ -85,8 +82,6 @@ namespace SimpleApi.handler
 
             if (result.IsSuccess())
             {
-                _log.Debug("StageIdx:{0}",result.StageIndex);
-
                 var joinRoomAnswer = JoinRoomAnswer.Parser.ParseFrom(result.JoinStageRes.Data);
                 apiSender.Reply(new ReplyPacket(new JoinRoomRes{
                         Data = joinRoomAnswer.Data,
@@ -101,8 +96,7 @@ namespace SimpleApi.handler
 
         private async Task CreateJoinStage(Packet packet, IApiSender apiSender)
         {
-            _log.Debug("CreateJoinRoomReq : accountId:{0},sid:{1},msgName:{2}"
-                ,apiSender.AccountId,apiSender.Sid,SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name);
+            _log.Debug(() => $"CreateJoinRoomReq - accountId:{apiSender.AccountId},sid:{apiSender.Sid},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
             var request = CreateJoinRoomReq.Parser.ParseFrom(packet.Data);
             var data = request.Data;
@@ -126,8 +120,7 @@ namespace SimpleApi.handler
 
         private async Task LeaveRoomNoti(Packet packet, IApiBackendSender backendSender)
         {
-            _log.Debug("LeaveRoomNoti : accountId:{0},,msgName:{1}"
-                ,backendSender.AccountId,SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name);
+            _log.Debug(() => $"LeaveRoomNoti : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
 
             var notify = LeaveRoomNotify.Parser.ParseFrom(packet.Data);
@@ -137,8 +130,7 @@ namespace SimpleApi.handler
 
         private async Task HelloToApi(Packet packet, IApiBackendSender backendSender)
         {
-            _log.Debug("HelloToApi : accountId:{0},,msgName:{1}"
-                ,backendSender.AccountId,SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name);
+            _log.Debug(()=>$"HelloToApi : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
             string data = HelloToApiReq.Parser.ParseFrom(packet.Data).Data;
             backendSender.Reply(new ReplyPacket(new HelloToApiRes { Data = data }));

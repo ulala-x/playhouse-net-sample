@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using PlayHouse.Utils;
+using Serilog;
+using SimpleConfigure;
 
 namespace SimpleApi
 {
@@ -6,7 +8,7 @@ namespace SimpleApi
     {
         public static void Main(string[] args)
         {
-            ThreadPool.SetMinThreads(workerThreads: 50, completionPortThreads: 50);
+            //ThreadPool.SetMinThreads(workerThreads: 50, completionPortThreads: 50);
 
             string logFilePath = $"logs/simple.txt";
 
@@ -16,12 +18,13 @@ namespace SimpleApi
                 File.Delete(logFilePath);
             }
 
+            LoggerConfigure.SetLogger(new SimpleLogger(),LogLevel.Trace);
 
             // Serilog 구성
             Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Verbose()
-                        .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information) // 콘솔에는 정보 레벨 이상만 로그
-                         .WriteTo.Async(a => a.File(logFilePath,shared:true, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose)) // 파일에는 디버그 레벨 이상 로그
+                        .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information) 
+                         .WriteTo.Async(a => a.File(logFilePath,shared:true, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose)) 
                         .CreateLogger();
 
             var runner = new ApiApplication();
