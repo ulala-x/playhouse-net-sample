@@ -9,7 +9,7 @@ namespace SimplePlay.Room
     {
         private LOG<SimpleRoom> _log = new();
         private PacketHandler<SimpleRoom, SimpleUser> _handler = new ();
-        private Dictionary<Guid,SimpleUser> _userMap = new ();
+        private Dictionary<string,SimpleUser> _userMap = new ();
         private int _count;
         private IStageSender _stageSender;
 
@@ -60,15 +60,16 @@ namespace SimplePlay.Room
 
             if(_userMap.Count == 0)
             {
-                _log.Debug(() => $"add count timer - [threadName:${Thread.CurrentThread.Name}] ");
-                StageSender.AddCountTimer(TimeSpan.FromSeconds(5), 1, TimeSpan.FromSeconds(5), async () => {
-                    if(_userMap.Count == 0)
-                    {
-                        _log.Debug(() => $"close room - [threadName:{Thread.CurrentThread.Name}]");
-                        StageSender.CloseStage();
-                        await Task.CompletedTask;
-                    }
-                });
+                StageSender.CloseStage();
+                //_log.Debug(() => $"add count timer - [threadName:${Thread.CurrentThread.Name}] ");
+                //StageSender.AddCountTimer(TimeSpan.FromSeconds(5), 1, TimeSpan.FromSeconds(5), async () => {
+                //    if(_userMap.Count == 0)
+                //    {
+                //        _log.Debug(() => $"close room - [threadName:{Thread.CurrentThread.Name}]");
+                //        StageSender.CloseStage();
+                //        await Task.CompletedTask;
+                //    }
+                //});
             }
         }
 

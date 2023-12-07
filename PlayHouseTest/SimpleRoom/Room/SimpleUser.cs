@@ -31,6 +31,6 @@ namespace SimplePlay.Room
             await Task.CompletedTask;
         }
 
-        internal Guid GetAccountId() => ActorSender.AccountId();
+        internal string GetAccountId() => ActorSender.AccountId();
     }
 }

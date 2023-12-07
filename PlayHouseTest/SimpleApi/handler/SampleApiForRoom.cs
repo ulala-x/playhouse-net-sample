@@ -4,6 +4,7 @@ using Google.Protobuf;
 using Microsoft.Extensions.DependencyInjection;
 using Simple;
 using PlayHouse.Utils;
+using System.Diagnostics.Metrics;
 
 namespace SimpleApi.handler
 {
@@ -12,6 +13,8 @@ namespace SimpleApi.handler
 
         private LOG<SampleApiForRoom> _log = new();
         private readonly ISystemPanel _systemPanel;
+        private Random _random = new Random();
+        private static long _stageId = 1;
 
         public SampleApiForRoom()
         {
@@ -46,7 +49,7 @@ namespace SimpleApi.handler
             var randRoomServerInfo = _systemPanel!.GetServerInfoByService(RoomServiceId);
 
             var roomEndpoint = randRoomServerInfo.BindEndpoint();
-            var stageId = Guid.NewGuid();
+            var stageId = Interlocked.Increment(ref _stageId).ToString();
 
             var result = await apiSender.CreateStage(roomEndpoint, RoomType, stageId, new Packet(new CreateRoomAsk() { Data = data}));
 
@@ -58,7 +61,7 @@ namespace SimpleApi.handler
             {
                 apiSender.Reply(new ReplyPacket(new CreateRoomRes() {
                         Data = createRoomAnswer.Data,
-                        StageId = ByteString.CopyFrom(stageId.ToByteArray()),
+                        StageId = stageId,
                         PlayEndpoint = roomEndpoint,
                 }));
             }
@@ -74,7 +77,7 @@ namespace SimpleApi.handler
 
             var request = JoinRoomReq.Parser.ParseFrom(packet.Data);
             string data = request.Data;
-            Guid stageId = new Guid(request.StageId.ToByteArray());
+            string stageId = request.StageId;
             string roomEndpoint = request.PlayEndpoint;
 
 
@@ -100,7 +103,7 @@ namespace SimpleApi.handler
 
             var request = CreateJoinRoomReq.Parser.ParseFrom(packet.Data);
             var data = request.Data;
-            Guid stageId = new Guid(request.StageId.ToByteArray());
+            string stageId = request.StageId;
             var roomEndpoint = request.PlayEndpoint;
             var createPayload = new Packet(new CreateRoomAsk() { Data = data,});
             

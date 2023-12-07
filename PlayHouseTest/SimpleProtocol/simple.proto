@@ -40,14 +40,14 @@ message CreateRoomReq{
 }
 //msgId = 7
 message CreateRoomRes{
-  bytes stage_id = 1;
+  string stage_id = 1;
   string data = 2;
   string playEndpoint = 3;
 }
 //msgId = 8
 message JoinRoomReq{
   string playEndpoint = 1;
-  bytes stage_id = 2;
+  string stage_id = 2;
   bytes account_id = 3;
   string data = 4;
 }
@@ -59,8 +59,8 @@ message JoinRoomRes{
 //msgId = 10
 message CreateJoinRoomReq {
   string playEndpoint = 1;
-  bytes stage_id = 2;
-  bytes account_id = 3;
+  string stage_id = 2;
+  string account_id = 3;
   string data = 4;
 }
 //msgId = 11

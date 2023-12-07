@@ -29,14 +29,14 @@ namespace SimpleApi.handler
         {
             var req = Simple.AuthenticateReq.Parser.ParseFrom(packet.Data);
             
-            _log.Debug(() => $"TestTimeoutReq - [accountId:{req.PlatformUid},sessionEndpoint:{req.Token},sid:{apiSender.Sid}]");
+            _log.Debug(() => $"Authenticate - [accountId:{req.PlatformUid},sessionEndpoint:{req.Token},sid:{apiSender.Sid}]");
 
-            //Guid accountId = Guid.NewGuid();
-            Guid accountId = Guid.Parse(req.PlatformUid);
+            //string accountId = string.Newstring();
+            string accountId = req.PlatformUid;
 
             apiSender.Authenticate(accountId);
 
-            var message = new Simple.AuthenticateRes { UserInfo = accountId.ToString() };
+            var message = new Simple.AuthenticateRes {AccountId = accountId, UserInfo = accountId.ToString() };
             apiSender.Reply(new ReplyPacket (message));
             await Task.CompletedTask;
         }

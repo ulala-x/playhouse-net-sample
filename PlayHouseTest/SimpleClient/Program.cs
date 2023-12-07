@@ -16,7 +16,7 @@ namespace SimpleClient
                 File.Delete(logFilePath);
             }
 
-            LoggerConfigure.SetLogger(new SimpleLogger(),LogLevel.Debug);
+            LoggerConfigure.SetLogger(new SimpleLogger(),LogLevel.Trace);
 
             // Serilog 구성
             Log.Logger = new LoggerConfiguration()
@@ -25,7 +25,7 @@ namespace SimpleClient
                          .WriteTo.Async(a => a.File(logFilePath,shared:true, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose))
                         .CreateLogger();
 
-            Task[] tasks = new Task[3000];
+            Task[] tasks = new Task[100];
             
 
             for (int i = 0; i < tasks.Length; i++)

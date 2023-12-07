@@ -8,7 +8,7 @@ namespace SimpleApi.handler
     {
         private readonly ILogger _logger = Log.Logger;
 
-        public void OnDisconnect(Guid accountId)
+        public void OnDisconnect(string accountId)
         {
             _logger.Debug("OnDisconnect {0}",accountId);
         }
