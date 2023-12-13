@@ -44,6 +44,7 @@ namespace SimpleApi
                     ServiceId = 1,
                     RedisPort = 16379,
                     RequestTimeoutSec = 0,
+                    NodeId = 1,
                 };
                 var apiOption = new ApiOption
                 {

@@ -26,6 +26,7 @@ class SessionApplication
                 RedisPort = redisPort,
                 ServerSystem = (systemPanel, sender) => new SessionSystem(systemPanel, sender),
                 RequestTimeoutSec = 0,
+                NodeId = 0,
             };
 
             var sessionOption = new SessionOption

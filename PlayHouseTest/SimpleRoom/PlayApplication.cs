@@ -29,6 +29,7 @@ namespace SimplePlay
                     RedisPort = redisPort,
                     ServerSystem = (systemPanel, sender) => new PlaySystem(systemPanel, sender),
                     RequestTimeoutSec = 0,
+                    NodeId = 2,
                 };
 
                 var playOption = new PlayOption();
