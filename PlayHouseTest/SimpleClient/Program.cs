@@ -21,11 +21,11 @@ namespace SimpleClient
             // Serilog 구성
             Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Verbose()
-                        .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information) // 콘솔에는 정보 레벨 이상만 로그
+                        .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug) // 콘솔에는 정보 레벨 이상만 로그
                          .WriteTo.Async(a => a.File(logFilePath,shared:true, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose))
                         .CreateLogger();
 
-            Task[] tasks = new Task[100];
+            Task[] tasks = new Task[1];
             
 
             for (int i = 0; i < tasks.Length; i++)

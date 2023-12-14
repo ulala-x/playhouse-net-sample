@@ -23,7 +23,7 @@ namespace SimpleApi
             // Serilog 구성
             Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Verbose()
-                        .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information) 
+                        .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug) 
                          .WriteTo.Async(a => a.File(logFilePath,shared:true, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose)) 
                         .CreateLogger();
 
