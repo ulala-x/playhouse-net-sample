@@ -7,17 +7,18 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Simple;
+using SimpleProtocol;
 
 namespace SimplePlay.Room.Command
 {
     internal class LeaveRoomCmd : IPacketCmd<SimpleRoom, SimpleUser>
     {
-        public async Task Execute(SimpleRoom room, SimpleUser user, Packet packet)
+        public async Task Execute(SimpleRoom room, SimpleUser user, IPacket packet)
         {
             var request = LeaveRoomReq.Parser.ParseFrom(packet.Data);
 
             user.ActorSender.SendToApi(
-                new Packet(new LeaveRoomNotify()
+                new SimplePacket(new LeaveRoomNotify()
                 {
                     SessionEndpoint = user.ActorSender.SessionEndpoint(),
                     Sid = user.ActorSender.Sid(),

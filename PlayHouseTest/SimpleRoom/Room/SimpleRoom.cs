@@ -3,6 +3,7 @@ using PlayHouse.Production.Play;
 using PlayHouse.Utils;
 using Simple;
 using SimplePlay.Room.Command;
+using SimpleProtocol;
 namespace SimplePlay.Room
 {
     internal class SimpleRoom : IStage
@@ -36,7 +37,7 @@ namespace SimplePlay.Room
 
         }
 
-        public async Task<ReplyPacket> OnCreate(Packet packet)
+        public async Task<ReplyPacket> OnCreate(IPacket packet)
         {
             _log.Debug(() => $"OnCreate -  [stageType:{StageSender.StageType},stageId:{StageSender.StageId},msgId:${packet.MsgId}]");
             var request = CreateRoomAsk.Parser.ParseFrom(packet.Data);
@@ -73,14 +74,14 @@ namespace SimplePlay.Room
             }
         }
 
-        public async Task OnDispatch(object actor, Packet packet)
+        public async Task OnDispatch(object actor, IPacket packet)
         {
             SimpleUser user = (SimpleUser)actor;
             _log.Debug(() => $"onDispatch - [stageType:{StageSender.StageType},stageId:${StageSender.StageId},msgId:${packet.MsgId}]");
             await _handler.Dispatch(this, user, packet);
         }
 
-        public async Task<ReplyPacket> OnJoinStage(object actor, Packet packet)
+        public async Task<ReplyPacket> OnJoinStage(object actor, IPacket packet)
         {
             SimpleUser user = (SimpleUser)actor;
 
@@ -107,7 +108,7 @@ namespace SimplePlay.Room
             List<Task<ReplyPacket>> requests = new List<Task<ReplyPacket>>();
             foreach (var item in _userMap.Values)
             {
-                requests.Add(item.ActorSender.AsyncToApi(new Packet(new HelloToApiReq() { Data = "Hello" })));
+                requests.Add(item.ActorSender.AsyncToApi(new SimplePacket(new HelloToApiReq() { Data = "Hello" })));
             }
 
             ReplyPacket[] replys = await Task.WhenAll(requests);
@@ -122,7 +123,7 @@ namespace SimplePlay.Room
         }
 
  
-        internal void SendToAll(Packet packet)
+        internal void SendToAll(IPacket packet)
         {
             foreach (var item in _userMap.Values)
             {

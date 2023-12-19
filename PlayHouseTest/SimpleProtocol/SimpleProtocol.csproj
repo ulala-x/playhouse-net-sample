@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\playhouse-net\PlayHouse\PlayHouse\PlayHouse.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Protobuf Include="simple.proto" GrpcServices="None" />
   </ItemGroup>
 

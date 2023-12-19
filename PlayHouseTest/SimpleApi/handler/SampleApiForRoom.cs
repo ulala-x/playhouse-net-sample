@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Simple;
 using PlayHouse.Utils;
 using System.Diagnostics.Metrics;
+using SimpleProtocol;
 
 namespace SimpleApi.handler
 {
@@ -38,7 +39,7 @@ namespace SimpleApi.handler
         }
 
 
-        private async Task CreateStage(Packet packet, IApiSender apiSender)
+        private async Task CreateStage(IPacket packet, IApiSender apiSender)
         {
 
             _log.Debug(()=>
@@ -51,7 +52,7 @@ namespace SimpleApi.handler
             var roomEndpoint = randRoomServerInfo.BindEndpoint();
             var stageId = Interlocked.Increment(ref _stageId).ToString();
 
-            var result = await apiSender.CreateStage(roomEndpoint, RoomType, stageId, new Packet(new CreateRoomAsk() { Data = data}));
+            var result = await apiSender.CreateStage(roomEndpoint, RoomType, stageId, new SimplePacket(new CreateRoomAsk() { Data = data}));
 
             var createRoomAnswer = CreateRoomAnswer.Parser.ParseFrom(result.CreateStageRes.Data);
 
@@ -71,7 +72,7 @@ namespace SimpleApi.handler
             }
         }
 
-        private async Task JoinStage(Packet packet, IApiSender apiSender)
+        private async Task JoinStage(IPacket packet, IApiSender apiSender)
         {
             _log.Debug(() => $"joinRoom - accountId:{apiSender.AccountId}, sid:{apiSender.Sid}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(x => x.Index == packet.MsgId).Name}");
 
@@ -81,7 +82,7 @@ namespace SimpleApi.handler
             string roomEndpoint = request.PlayEndpoint;
 
 
-            var result = await apiSender.JoinStage(roomEndpoint, stageId, new Packet(new JoinRoomAsk() { Data = data }));
+            var result = await apiSender.JoinStage(roomEndpoint, stageId, new SimplePacket(new JoinRoomAsk() { Data = data }));
 
             if (result.IsSuccess())
             {
@@ -97,7 +98,7 @@ namespace SimpleApi.handler
             }
         }
 
-        private async Task CreateJoinStage(Packet packet, IApiSender apiSender)
+        private async Task CreateJoinStage(IPacket packet, IApiSender apiSender)
         {
             _log.Debug(() => $"CreateJoinRoomReq - accountId:{apiSender.AccountId},sid:{apiSender.Sid},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
@@ -105,9 +106,9 @@ namespace SimpleApi.handler
             var data = request.Data;
             string stageId = request.StageId;
             var roomEndpoint = request.PlayEndpoint;
-            var createPayload = new Packet(new CreateRoomAsk() { Data = data,});
+            var createPayload = new SimplePacket(new CreateRoomAsk() { Data = data,});
             
-            var joinPayload = new Packet(new JoinRoomAsk() { Data = data, });
+            var joinPayload = new SimplePacket(new JoinRoomAsk() { Data = data, });
 
             var result = await apiSender.CreateJoinStage(roomEndpoint, RoomType, stageId, createPayload, joinPayload);
             if (result.IsSuccess())
@@ -121,17 +122,17 @@ namespace SimpleApi.handler
             }
         }
 
-        private async Task LeaveRoomNoti(Packet packet, IApiBackendSender backendSender)
+        private async Task LeaveRoomNoti(IPacket packet, IApiBackendSender backendSender)
         {
             _log.Debug(() => $"LeaveRoomNoti : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
 
             var notify = LeaveRoomNotify.Parser.ParseFrom(packet.Data);
-            backendSender.SendToClient(notify.SessionEndpoint, notify.Sid, new Packet(notify));
+            backendSender.SendToClient(notify.SessionEndpoint, notify.Sid, new SimplePacket(notify));
             await Task.CompletedTask;
         }
 
-        private async Task HelloToApi(Packet packet, IApiBackendSender backendSender)
+        private async Task HelloToApi(IPacket packet, IApiBackendSender backendSender)
         {
             _log.Debug(()=>$"HelloToApi : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 

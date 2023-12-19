@@ -11,7 +11,7 @@ namespace SimplePlay.Room.Command
 {
     internal class ChatMsgCmd : IPacketCmd<SimpleRoom, SimpleUser>
     {
-        public async Task Execute(SimpleRoom room, SimpleUser actor, Packet packet)
+        public async Task Execute(SimpleRoom room, SimpleUser actor, IPacket packet)
         {
             room.SendToAll(packet);
             // room.StageSender.AsyncBlock(

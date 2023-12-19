@@ -15,7 +15,7 @@ namespace SimplePlay
             _sender = sender;
         }
 
-        public async Task OnDispatch(Packet packet)
+        public async Task OnDispatch(IPacket packet)
         {
             _log.Information($"OnDispatch msgId:{packet.MsgId}");
             await Task.CompletedTask;

@@ -20,7 +20,7 @@ namespace SimpleApi
             GlobalControlProvider.Sender = sender;
         }
 
-        public async Task OnDispatch(Packet packet)
+        public async Task OnDispatch(IPacket packet)
         {
             _log.Information($"{packet.MsgId} packet received");
 

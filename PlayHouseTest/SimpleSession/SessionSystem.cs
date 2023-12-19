@@ -22,7 +22,7 @@ namespace SimpleSession
             _sender = sender;
         }
 
-        public async Task OnDispatch(Packet packet)
+        public async Task OnDispatch(IPacket packet)
         {
             _log.Information("OnDispatch");
             await Task.CompletedTask;

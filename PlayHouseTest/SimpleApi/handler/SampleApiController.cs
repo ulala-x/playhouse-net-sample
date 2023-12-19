@@ -2,6 +2,7 @@
 using PlayHouse.Production;
 using PlayHouse.Production.Api;
 using PlayHouse.Utils;
+using SimpleProtocol;
 
 namespace SimpleApi.handler
 {
@@ -19,13 +20,13 @@ namespace SimpleApi.handler
         }
 
      
-        private async Task TestTimeoutReq(Packet packet, IApiSender apiSender)
+        private async Task TestTimeoutReq(IPacket packet, IApiSender apiSender)
         {
             _log.Debug(()=> $"TestTimeoutReq - accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
             await Task.CompletedTask;
         }
 
-        private async Task Authenticate(Packet packet, IApiSender apiSender)
+        private async Task Authenticate(IPacket packet, IApiSender apiSender)
         {
             var req = Simple.AuthenticateReq.Parser.ParseFrom(packet.Data);
             
@@ -34,6 +35,7 @@ namespace SimpleApi.handler
             //string accountId = string.Newstring();
             string accountId = req.PlatformUid;
 
+
             apiSender.Authenticate(accountId);
 
             var message = new Simple.AuthenticateRes {AccountId = accountId, UserInfo = accountId.ToString() };
@@ -41,7 +43,7 @@ namespace SimpleApi.handler
             await Task.CompletedTask;
         }
 
-        private async Task Hello(Packet packet, IApiSender apiSender)
+        private async Task Hello(IPacket packet, IApiSender apiSender)
         {
 
             var req = Simple.HelloReq.Parser.ParseFrom(packet.Data);
@@ -52,7 +54,7 @@ namespace SimpleApi.handler
             await Task.CompletedTask;
         }
 
-        private async Task SendMessage(Packet packet, IApiSender apiSender)
+        private async Task SendMessage(IPacket packet, IApiSender apiSender)
         {
             var recv = Simple.SendMsg.Parser.ParseFrom(packet.Data);
             _log.Debug(() =>$"Message - [message:{recv.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}]");
@@ -65,13 +67,13 @@ namespace SimpleApi.handler
         private void SendTestApiSenderContext(string message)
         {
             
-            AsyncContext.ApiSender!.SendToClient(new Packet(new Simple.SendMsg() { Message = message}));
+            AsyncContext.ApiSender!.SendToClient(new SimplePacket(new Simple.SendMsg() { Message = message}));
         }
 
-        private async Task CloseSessionMsg(Packet packet, IApiSender apiSender)
+        private async Task CloseSessionMsg(IPacket packet, IApiSender apiSender)
         {
             _log.Debug(()=>$"CloseSessionMsg - accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
-            apiSender.SendToClient(new Packet (new Simple.CloseSessionMsg()));
+            apiSender.SendToClient(new SimplePacket(new Simple.CloseSessionMsg()));
             apiSender.SessionClose(apiSender.SessionEndpoint, apiSender.Sid);
             await Task.CompletedTask;
         }
