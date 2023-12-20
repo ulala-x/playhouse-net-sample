@@ -60,7 +60,7 @@ namespace SimpleApi.handler
 
             if (result.IsSuccess())
             {
-                apiSender.Reply(new ReplyPacket(new CreateRoomRes() {
+                apiSender.Reply(new SimplePacket(new CreateRoomRes() {
                         Data = createRoomAnswer.Data,
                         StageId = stageId,
                         PlayEndpoint = roomEndpoint,
@@ -68,7 +68,7 @@ namespace SimpleApi.handler
             }
             else
             {
-                apiSender.Reply(new ReplyPacket(result.ErrorCode));
+                apiSender.Reply(result.ErrorCode);
             }
         }
 
@@ -87,14 +87,14 @@ namespace SimpleApi.handler
             if (result.IsSuccess())
             {
                 var joinRoomAnswer = JoinRoomAnswer.Parser.ParseFrom(result.JoinStageRes.Data);
-                apiSender.Reply(new ReplyPacket(new JoinRoomRes{
+                apiSender.Reply(new SimplePacket(new JoinRoomRes{
                         Data = joinRoomAnswer.Data,
                         StageIdx = result.StageIndex,
                 }));
             }
             else
             {
-                apiSender.Reply(new ReplyPacket(result.ErrorCode));
+                apiSender.Reply(result.ErrorCode);
             }
         }
 
@@ -114,11 +114,11 @@ namespace SimpleApi.handler
             if (result.IsSuccess())
             {
                 var joinRoomAnswer = CreateJoinRoomAnswer.Parser.ParseFrom(result.JoinStageRes.Data);
-                apiSender.Reply(new ReplyPacket(new CreateJoinRoomRes() { Data = joinRoomAnswer.Data, StageIdx = result.StageIndex }));
+                apiSender.Reply(new SimplePacket(new CreateJoinRoomRes() { Data = joinRoomAnswer.Data, StageIdx = result.StageIndex }));
             }
             else
             {
-                apiSender.Reply(new ReplyPacket(result.ErrorCode));
+                apiSender.Reply(result.ErrorCode);
             }
         }
 
@@ -137,7 +137,7 @@ namespace SimpleApi.handler
             _log.Debug(()=>$"HelloToApi : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
             string data = HelloToApiReq.Parser.ParseFrom(packet.Data).Data;
-            backendSender.Reply(new ReplyPacket(new HelloToApiRes { Data = data }));
+            backendSender.Reply(new SimplePacket(new HelloToApiRes { Data = data }));
             await Task.CompletedTask;
         }
 

@@ -2,6 +2,7 @@
 using PlayHouse.Service;
 using Serilog;
 using Simple;
+using SimpleProtocol;
 
 namespace SimpleApi
 {
@@ -29,7 +30,7 @@ namespace SimpleApi
                 if (packet.MsgId == HelloReq.Descriptor.Index)
                 {
                     var message = HelloReq.Parser.ParseFrom(packet.Data).Message;
-                    _sender.Reply(new ReplyPacket(new HelloRes { Message = message }));
+                    _sender.Reply(new SimplePacket(new HelloRes { Message = message }));
                     await Task.CompletedTask;
                     
                 }

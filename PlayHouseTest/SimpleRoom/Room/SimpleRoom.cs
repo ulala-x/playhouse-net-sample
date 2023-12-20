@@ -37,13 +37,13 @@ namespace SimplePlay.Room
 
         }
 
-        public async Task<ReplyPacket> OnCreate(IPacket packet)
+        public async Task<(ushort errorCode,IPacket reply)> OnCreate(IPacket packet)
         {
             _log.Debug(() => $"OnCreate -  [stageType:{StageSender.StageType},stageId:{StageSender.StageId},msgId:${packet.MsgId}]");
             var request = CreateRoomAsk.Parser.ParseFrom(packet.Data);
 
             await Task.CompletedTask;
-            return new ReplyPacket(new CreateRoomAnswer() { Data = request.Data });
+            return (0,new SimplePacket(new CreateRoomAnswer() { Data = request.Data }));
         }
 
         public async Task OnDisconnect(object actor)
@@ -81,7 +81,7 @@ namespace SimplePlay.Room
             await _handler.Dispatch(this, user, packet);
         }
 
-        public async Task<ReplyPacket> OnJoinStage(object actor, IPacket packet)
+        public async Task<(ushort errorCode, IPacket reply)> OnJoinStage(object actor, IPacket packet)
         {
             SimpleUser user = (SimpleUser)actor;
 
@@ -89,7 +89,7 @@ namespace SimplePlay.Room
             var request = JoinRoomAsk.Parser.ParseFrom(packet.Data);
 
             await Task.CompletedTask;
-            return new ReplyPacket(new JoinRoomAnswer() { Data = request.Data });
+            return (0, new SimplePacket(new JoinRoomAnswer() { Data = request.Data }));
         }
 
         public async Task OnPostCreate()
@@ -105,18 +105,18 @@ namespace SimplePlay.Room
             _userMap[user.GetAccountId()] = user;
             _log.Debug(() => $"OnPostJoinStage - [stageType:{StageSender.StageType},stageId:${StageSender.StageId},accountId:{user.GetAccountId()}]");
 
-            List<Task<ReplyPacket>> requests = new List<Task<ReplyPacket>>();
+            List<Task<(ushort errorCode, IPacket reply)>> requests = new ();
             foreach (var item in _userMap.Values)
             {
-                requests.Add(item.ActorSender.AsyncToApi(new SimplePacket(new HelloToApiReq() { Data = "Hello" })));
+                requests.Add(item.ActorSender.RequestToApi(new SimplePacket(new HelloToApiReq() { Data = "Hello" })));
             }
 
-            ReplyPacket[] replys = await Task.WhenAll(requests);
+            (ushort errorCode, IPacket reply)[] replys = await Task.WhenAll(requests);
 
             
             foreach (var reply in replys)
             {
-                var helloRes = HelloToApiReq.Parser.ParseFrom(reply.Data);    
+                var helloRes = HelloToApiReq.Parser.ParseFrom(reply.reply.Data);    
                 _log.Debug(() => $"hello res - [data:{helloRes.Data}]");
             }
 

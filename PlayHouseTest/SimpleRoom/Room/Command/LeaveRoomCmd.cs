@@ -29,7 +29,7 @@ namespace SimplePlay.Room.Command
             room.LeaveRoom(user);
             user.ActorSender.LeaveStage();
 
-            room.StageSender.Reply(new ReplyPacket(new LeaveRoomRes() { Data = request.Data}));
+            room.StageSender.Reply(new SimplePacket(new LeaveRoomRes() { Data = request.Data}));
 
             await Task.CompletedTask;
 

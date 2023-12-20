@@ -2,6 +2,7 @@
 using PlayHouse.Production;
 using PlayHouse.Production.Api;
 using PlayHouse.Utils;
+using Simple;
 using SimpleProtocol;
 
 namespace SimpleApi.handler
@@ -12,11 +13,11 @@ namespace SimpleApi.handler
 
         public  void Handles(IHandlerRegister register, IBackendHandlerRegister backendRegister)
         {
-            register.Add(Simple.AuthenticateReq.Descriptor.Index, Authenticate);
-            register.Add(Simple.HelloReq.Descriptor.Index, Hello);
+            register.Add(AuthenticateReq.Descriptor.Index, Authenticate);
+            register.Add(HelloReq.Descriptor.Index, Hello);
             register.Add(Simple.CloseSessionMsg.Descriptor.Index, CloseSessionMsg);
             register.Add(Simple.TestTimeoutReq.Descriptor.Index, TestTimeoutReq);
-            register.Add(Simple.SendMsg.Descriptor.Index,SendMessage);
+            register.Add(SendMsg.Descriptor.Index,SendMessage);
         }
 
      
@@ -39,7 +40,7 @@ namespace SimpleApi.handler
             apiSender.Authenticate(accountId);
 
             var message = new Simple.AuthenticateRes {AccountId = accountId, UserInfo = accountId.ToString() };
-            apiSender.Reply(new ReplyPacket (message));
+            apiSender.Reply(new SimplePacket (message));
             await Task.CompletedTask;
         }
 
@@ -50,7 +51,7 @@ namespace SimpleApi.handler
             _log.Debug(()=>$"Hello - [{req.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}]");
 
             //apiSender.Reply(new ReplyPacket (new Simple.HelloRes { Message = "hello" }));
-            apiSender.Reply(new ReplyPacket(0,Simple.HelloRes.Descriptor.Index));
+            apiSender.Reply(new SimplePacket(new HelloRes()));
             await Task.CompletedTask;
         }
 
@@ -67,7 +68,7 @@ namespace SimpleApi.handler
         private void SendTestApiSenderContext(string message)
         {
             
-            AsyncContext.ApiSender!.SendToClient(new SimplePacket(new Simple.SendMsg() { Message = message}));
+            ApiAsyncContext.ApiSender!.SendToClient(new SimplePacket(new Simple.SendMsg() { Message = message}));
         }
 
         private async Task CloseSessionMsg(IPacket packet, IApiSender apiSender)
