@@ -26,7 +26,7 @@ namespace SimpleApi.Filter
         public override void AfterExecution(IPacket packet, IApiSender apiSender)
         {
 
-            foreach (var transfered in SenderAsyncContext.SendPackets)
+            foreach (var transfered in AsyncContext.SendPackets)
             {
                 _log.Debug(() => $"send to {transfered.target} - [accountId:{apiSender.AccountId},transfered:{transfered.packet}]");
             }
@@ -46,7 +46,7 @@ namespace SimpleApi.Filter
         }
         public override void AfterExecution(IPacket packet, IApiBackendSender apiSender)
         {
-            foreach (var transfered in SenderAsyncContext.SendPackets)
+            foreach (var transfered in AsyncContext.SendPackets)
             {
                 _log.Debug(() => $"send to {transfered.target} - [accountId:{apiSender.AccountId},transfered:{transfered.packet}]");
             }
