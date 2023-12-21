@@ -29,7 +29,7 @@ namespace SimpleApi.handler
 
         private async Task Authenticate(IPacket packet, IApiSender apiSender)
         {
-            var req = Simple.AuthenticateReq.Parser.ParseFrom(packet.Data);
+            var req = packet.Parse<AuthenticateReq>();
             
             _log.Debug(() => $"Authenticate - [accountId:{req.PlatformUid},sessionEndpoint:{req.Token},sid:{apiSender.Sid}]");
 
@@ -47,7 +47,7 @@ namespace SimpleApi.handler
         private async Task Hello(IPacket packet, IApiSender apiSender)
         {
 
-            var req = Simple.HelloReq.Parser.ParseFrom(packet.Data);
+            var req = packet.Parse<Simple.HelloReq>();
             _log.Debug(()=>$"Hello - [{req.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}]");
 
             //apiSender.Reply(new ReplyPacket (new Simple.HelloRes { Message = "hello" }));
@@ -57,7 +57,7 @@ namespace SimpleApi.handler
 
         private async Task SendMessage(IPacket packet, IApiSender apiSender)
         {
-            var recv = Simple.SendMsg.Parser.ParseFrom(packet.Data);
+            var recv = packet.Parse<Simple.SendMsg>();
             _log.Debug(() =>$"Message - [message:{recv.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}]");
 
             await Task.Delay(100);

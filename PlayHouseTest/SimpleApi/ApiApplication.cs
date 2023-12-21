@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using ILogger = Serilog.ILogger;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using SimpleConfigure;
+using SimpleProtocol;
+using PlayHouse.Production.Api.Filter;
+using SimpleApi.Filter;
 
 namespace SimpleApi
 {
@@ -45,11 +48,16 @@ namespace SimpleApi
                     RedisPort = 16379,
                     RequestTimeoutSec = 0,
                     NodeId = 1,
+                    PacketProducer = (packet) => new SimplePacket(packet)
                 };
                 var apiOption = new ApiOption
                 {
                     ApiCallBackHandler = new DisconnectApi()
                 };
+
+                GlobalApiActionManager.AddFilter(new SimpleActionFilter());
+                GlobalApiActionManager.AddFilter(new SimpleBackendActionFilter());
+
                 var apiServer = new ApiServer(commonOption, apiOption);
                 apiServer.Start();
 

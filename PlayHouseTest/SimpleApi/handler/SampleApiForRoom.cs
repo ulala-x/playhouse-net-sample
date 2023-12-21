@@ -46,7 +46,7 @@ namespace SimpleApi.handler
                 $"CreateRoom - accountId:{apiSender.AccountId}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(mt => mt.Index == packet.MsgId).Name}"
             );
 
-            var data = CreateRoomReq.Parser.ParseFrom(packet.Data).Data;
+            var data = packet.Parse<CreateRoomReq>().Data;
             var randRoomServerInfo = _systemPanel!.GetServerInfoByService(RoomServiceId);
 
             var roomEndpoint = randRoomServerInfo.BindEndpoint();
@@ -54,7 +54,7 @@ namespace SimpleApi.handler
 
             var result = await apiSender.CreateStage(roomEndpoint, RoomType, stageId, new SimplePacket(new CreateRoomAsk() { Data = data}));
 
-            var createRoomAnswer = CreateRoomAnswer.Parser.ParseFrom(result.CreateStageRes.Data);
+            var createRoomAnswer = CreateRoomAnswer.Parser.ParseFrom(result.CreateStageRes.Payload.Data);
 
             _log.Debug(() => $"stageId:{stageId}");
 
@@ -76,17 +76,17 @@ namespace SimpleApi.handler
         {
             _log.Debug(() => $"joinRoom - accountId:{apiSender.AccountId}, sid:{apiSender.Sid}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(x => x.Index == packet.MsgId).Name}");
 
-            var request = JoinRoomReq.Parser.ParseFrom(packet.Data);
+            var request = packet.Parse<JoinRoomReq>();
             string data = request.Data;
             string stageId = request.StageId;
             string roomEndpoint = request.PlayEndpoint;
 
 
-            var result = await apiSender.JoinStage(roomEndpoint, stageId, new SimplePacket(new JoinRoomAsk() { Data = data }));
+            JoinStageResult result = await apiSender.JoinStage(roomEndpoint, stageId, new SimplePacket(new JoinRoomAsk() { Data = data }));
 
             if (result.IsSuccess())
             {
-                var joinRoomAnswer = JoinRoomAnswer.Parser.ParseFrom(result.JoinStageRes.Data);
+                var joinRoomAnswer = result.JoinStageRes.Parse<JoinRoomAnswer>();
                 apiSender.Reply(new SimplePacket(new JoinRoomRes{
                         Data = joinRoomAnswer.Data,
                         StageIdx = result.StageIndex,
@@ -102,7 +102,7 @@ namespace SimpleApi.handler
         {
             _log.Debug(() => $"CreateJoinRoomReq - accountId:{apiSender.AccountId},sid:{apiSender.Sid},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
-            var request = CreateJoinRoomReq.Parser.ParseFrom(packet.Data);
+            var request = packet.Parse<CreateJoinRoomReq>();
             var data = request.Data;
             string stageId = request.StageId;
             var roomEndpoint = request.PlayEndpoint;
@@ -113,7 +113,8 @@ namespace SimpleApi.handler
             var result = await apiSender.CreateJoinStage(roomEndpoint, RoomType, stageId, createPayload, joinPayload);
             if (result.IsSuccess())
             {
-                var joinRoomAnswer = CreateJoinRoomAnswer.Parser.ParseFrom(result.JoinStageRes.Data);
+                //var joinRoomAnswer = CreateJoinRoomAnswer.Parser.ParseFrom(result.JoinStageRes.Payload.Data);
+                var joinRoomAnswer = result.JoinStageRes.Parse<JoinRoomAnswer>();
                 apiSender.Reply(new SimplePacket(new CreateJoinRoomRes() { Data = joinRoomAnswer.Data, StageIdx = result.StageIndex }));
             }
             else
@@ -127,7 +128,7 @@ namespace SimpleApi.handler
             _log.Debug(() => $"LeaveRoomNoti : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
 
-            var notify = LeaveRoomNotify.Parser.ParseFrom(packet.Data);
+            var notify = packet.Parse<LeaveRoomNotify>();
             backendSender.SendToClient(notify.SessionEndpoint, notify.Sid, new SimplePacket(notify));
             await Task.CompletedTask;
         }
@@ -136,7 +137,7 @@ namespace SimpleApi.handler
         {
             _log.Debug(()=>$"HelloToApi : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
 
-            string data = HelloToApiReq.Parser.ParseFrom(packet.Data).Data;
+            string data = packet.Parse<HelloToApiReq>().Data;
             backendSender.Reply(new SimplePacket(new HelloToApiRes { Data = data }));
             await Task.CompletedTask;
         }

@@ -40,13 +40,13 @@ namespace SimplePlay.Room
         public async Task<(ushort errorCode,IPacket reply)> OnCreate(IPacket packet)
         {
             _log.Debug(() => $"OnCreate -  [stageType:{StageSender.StageType},stageId:{StageSender.StageId},msgId:${packet.MsgId}]");
-            var request = CreateRoomAsk.Parser.ParseFrom(packet.Data);
+            var request = packet.Parse<CreateRoomAsk>();
 
             await Task.CompletedTask;
             return (0,new SimplePacket(new CreateRoomAnswer() { Data = request.Data }));
         }
 
-        public async Task OnDisconnect(object actor)
+        public async Task OnDisconnect(IActor actor)
         {
             SimpleUser user =(SimpleUser) actor;
             _log.Debug(() => $"OnDisconnect - [stageType:{StageSender.StageType},stageId:{StageSender.StageId},accountId:{user.GetAccountId()}]");
@@ -74,19 +74,19 @@ namespace SimplePlay.Room
             }
         }
 
-        public async Task OnDispatch(object actor, IPacket packet)
+        public async Task OnDispatch(IActor actor, IPacket packet)
         {
             SimpleUser user = (SimpleUser)actor;
             _log.Debug(() => $"onDispatch - [stageType:{StageSender.StageType},stageId:${StageSender.StageId},msgId:${packet.MsgId}]");
             await _handler.Dispatch(this, user, packet);
         }
 
-        public async Task<(ushort errorCode, IPacket reply)> OnJoinStage(object actor, IPacket packet)
+        public async Task<(ushort errorCode, IPacket reply)> OnJoinStage(IActor actor, IPacket packet)
         {
             SimpleUser user = (SimpleUser)actor;
 
             _log.Debug(() => $"OnJoinStage - [stageType:{StageSender.StageType},stageId:${StageSender.StageId},msgId:${packet.MsgId}]");
-            var request = JoinRoomAsk.Parser.ParseFrom(packet.Data);
+            var request = packet.Parse<JoinRoomAsk>();
 
             await Task.CompletedTask;
             return (0, new SimplePacket(new JoinRoomAnswer() { Data = request.Data }));
@@ -98,7 +98,7 @@ namespace SimplePlay.Room
             await Task.CompletedTask;
         }
 
-        public async Task OnPostJoinStage(object actor)
+        public async Task OnPostJoinStage(IActor actor)
         {
             SimpleUser user = (SimpleUser)actor;
 
@@ -116,7 +116,7 @@ namespace SimplePlay.Room
             
             foreach (var reply in replys)
             {
-                var helloRes = HelloToApiReq.Parser.ParseFrom(reply.reply.Data);    
+                var helloRes = reply.reply.Parse<HelloToApiRes>();    
                 _log.Debug(() => $"hello res - [data:{helloRes.Data}]");
             }
 

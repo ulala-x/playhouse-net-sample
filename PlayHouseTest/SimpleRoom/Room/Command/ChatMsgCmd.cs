@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Simple;
+using SimpleProtocol;
 
 namespace SimplePlay.Room.Command
 {
@@ -13,7 +14,8 @@ namespace SimplePlay.Room.Command
     {
         public async Task Execute(SimpleRoom room, SimpleUser actor, IPacket packet)
         {
-            room.SendToAll(packet);
+
+            room.SendToAll(packet.Copy());
             // room.StageSender.AsyncBlock(
             //     async () => {
             //         await Task.Delay(100);

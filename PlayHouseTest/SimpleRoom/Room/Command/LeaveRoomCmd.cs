@@ -15,7 +15,7 @@ namespace SimplePlay.Room.Command
     {
         public async Task Execute(SimpleRoom room, SimpleUser user, IPacket packet)
         {
-            var request = LeaveRoomReq.Parser.ParseFrom(packet.Data);
+            var request = packet.Parse<LeaveRoomReq>();
 
             user.ActorSender.SendToApi(
                 new SimplePacket(new LeaveRoomNotify()

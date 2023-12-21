@@ -5,6 +5,7 @@ using PlayHouse.Service.Play;
 using Serilog;
 using SimpleConfigure;
 using SimplePlay.Room;
+using SimpleProtocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace SimplePlay
                     ServerSystem = (systemPanel, sender) => new PlaySystem(systemPanel, sender),
                     RequestTimeoutSec = 0,
                     NodeId = 2,
+                    PacketProducer = (packet)=>new SimplePacket(packet)
                 };
 
                 var playOption = new PlayOption();

@@ -29,7 +29,7 @@ namespace SimpleApi
             {
                 if (packet.MsgId == HelloReq.Descriptor.Index)
                 {
-                    var message = HelloReq.Parser.ParseFrom(packet.Data).Message;
+                    var message = packet.Parse<HelloReq>().Message;
                     _sender.Reply(new SimplePacket(new HelloRes { Message = message }));
                     await Task.CompletedTask;
                     

@@ -101,6 +101,7 @@ message JoinRoomAnswer{
   string data = 1;
 }
 //msgId = 19
+/*
 message CreateJoinRoomAsk{
   string data = 1;
 }
@@ -108,6 +109,7 @@ message CreateJoinRoomAsk{
 message CreateJoinRoomAnswer{
   string data = 1;
 }
+*/
 //msgId = 21
 message LeaveRoomReq{
   string data = 1;
