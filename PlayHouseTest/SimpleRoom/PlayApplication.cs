@@ -1,4 +1,5 @@
-﻿using PlayHouse.Production;
+﻿using PlayHouse.Communicator.Message;
+using PlayHouse.Production;
 using PlayHouse.Production.Play;
 using PlayHouse.Service.Api;
 using PlayHouse.Service.Play;
@@ -31,7 +32,7 @@ namespace SimplePlay
                     ServerSystem = (systemPanel, sender) => new PlaySystem(systemPanel, sender),
                     RequestTimeoutSec = 0,
                     NodeId = 2,
-                    PacketProducer = (packet)=>new SimplePacket(packet)
+                    PacketProducer = (int msgId,IPayload payload)=>new SimplePacket(msgId,payload)
                 };
 
                 var playOption = new PlayOption();

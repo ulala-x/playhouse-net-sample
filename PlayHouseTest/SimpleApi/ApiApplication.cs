@@ -11,6 +11,7 @@ using SimpleConfigure;
 using SimpleProtocol;
 using PlayHouse.Production.Api.Filter;
 using SimpleApi.Filter;
+using PlayHouse.Communicator.Message;
 
 namespace SimpleApi
 {
@@ -48,7 +49,7 @@ namespace SimpleApi
                     RedisPort = 16379,
                     RequestTimeoutSec = 0,
                     NodeId = 1,
-                    PacketProducer = (packet) => new SimplePacket(packet)
+                    PacketProducer = (int msgId,IPayload paylaod) => new SimplePacket(msgId,paylaod)
                 };
                 var apiOption = new ApiOption
                 {

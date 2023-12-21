@@ -47,12 +47,12 @@ namespace SimpleProtocol
             _Payload = new SimpleProtoPayload(message);
             _parsedMessage = message;
         }
-        public SimplePacket(IPacket packet)
-        {
-            _msgId = packet.MsgId;
-            _Payload = packet.Payload;
-        }
-        private SimplePacket(int msgId,IPayload payload)
+        //public SimplePacket(IPacket packet)
+        //{
+        //    _msgId = packet.MsgId;
+        //    _Payload = packet.Payload;
+        //}
+        public SimplePacket(int msgId,IPayload payload)
         {
             _msgId=msgId;
             _Payload = new CopyPayload(payload);
