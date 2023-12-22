@@ -4,13 +4,8 @@ using SimpleApi.handler;
 using PlayHouse.Production;
 using PlayHouse.Production.Api;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ILogger = Serilog.ILogger;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-using SimpleConfigure;
 using SimpleProtocol;
-using PlayHouse.Production.Api.Filter;
-using SimpleApi.Filter;
 using PlayHouse.Communicator.Message;
 
 namespace SimpleApi
