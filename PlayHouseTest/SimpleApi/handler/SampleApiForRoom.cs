@@ -1,10 +1,8 @@
 ﻿using PlayHouse.Production.Api;
 using PlayHouse.Production;
-using Google.Protobuf;
 using Microsoft.Extensions.DependencyInjection;
 using Simple;
 using PlayHouse.Utils;
-using System.Diagnostics.Metrics;
 using SimpleProtocol;
 
 namespace SimpleApi.handler

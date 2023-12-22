@@ -56,8 +56,6 @@ namespace SimpleApi
                     ApiCallBackHandler = new DisconnectApi()
                 };
 
-                GlobalApiActionManager.AddFilter(new SimpleActionFilter());
-                GlobalApiActionManager.AddFilter(new SimpleBackendActionFilter());
 
                 var apiServer = new ApiServer(commonOption, apiOption);
                 apiServer.Start();

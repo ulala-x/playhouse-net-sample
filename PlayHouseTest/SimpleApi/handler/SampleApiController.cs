@@ -3,10 +3,12 @@ using PlayHouse.Production;
 using PlayHouse.Production.Api;
 using PlayHouse.Utils;
 using Simple;
+using SimpleApi.Filter;
 using SimpleProtocol;
 
 namespace SimpleApi.handler
 {
+    [SimpleAspectify]
     public class SampleApiController : IApiController
     {
         private LOG<SampleApiController> _log = new();
