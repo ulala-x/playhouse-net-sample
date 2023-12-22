@@ -15,16 +15,28 @@ namespace SimpleApi.Filter
         public override async Task Intercept(Invocation invocation)
         {
             IPacket packet = (IPacket)invocation.Arguments[0];
-            SimplePacket simplePacket = (SimplePacket)packet;
+            
             IApiCommonSender sender = (IApiCommonSender)invocation.Arguments[1];
+
+            if(sender is IApiSender)
+            {
+                AsyncContext.ApiSender = sender as IApiSender;
+            }
+
+            AsyncContext.InitErrorCode();
+
+
+            SimplePacket simplePacket = (SimplePacket)packet;
 
             _log.Debug(() => $"from client - [accountId:{sender.AccountId}, transfered:{simplePacket}]");
 
             await invocation.Proceed();
-            foreach (var transfered in AsyncContext.SendPackets)
+            foreach (var transfered in AsyncStorage.SendPackets)
             {
                 _log.Debug(() => $"send to {transfered.target} - [accountId:{sender.AccountId},transfered:{transfered.packet}]");
             }
+
+            AsyncContext.Clear();
         }
     }
 

@@ -70,7 +70,7 @@ namespace SimpleApi.handler
         private void SendTestApiSenderContext(string message)
         {
             
-            AsyncContext.ApiSender.SendToClient(new SimplePacket(new Simple.SendMsg() { Message = message}));
+            AsyncContext.ApiSender!.SendToClient(new SimplePacket(new Simple.SendMsg() { Message = message}));
         }
 
         private async Task CloseSessionMsg(IPacket packet, IApiSender apiSender)
