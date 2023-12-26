@@ -30,7 +30,7 @@ namespace SimpleApi.Filter
             _log.Debug(() => $"from client - [accountId:{sender.AccountId}, transfered:{simplePacket}]");
 
             await invocation.Proceed();
-            foreach (var transfered in AsyncStorage.SendPackets)
+            foreach (var transfered in PacketContext.SendPackets)
             {
                 _log.Debug(() => $"send to {transfered.target} - [accountId:{sender.AccountId},transfered:{transfered.packet}]");
             }
