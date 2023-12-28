@@ -44,11 +44,11 @@ namespace SimpleApi
                     RedisPort = 16379,
                     RequestTimeoutSec = 0,
                     NodeId = 1,
-                    PacketProducer = (int msgId,IPayload paylaod) => new SimplePacket(msgId,paylaod)
+                    PacketProducer = (int msgId,IPayload paylaod,int msgSeq) => new SimplePacket(msgId,paylaod,msgSeq)
                 };
                 var apiOption = new ApiOption
                 {
-                    ApiCallBackHandler = new DisconnectApi()
+                    ServiceProvider = GlobalServiceProvider.Instance,
                 };
 
 

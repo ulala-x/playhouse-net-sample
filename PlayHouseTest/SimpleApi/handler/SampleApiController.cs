@@ -9,7 +9,7 @@ using SimpleProtocol;
 namespace SimpleApi.handler
 {
     [SimpleAspectify]
-    public class SampleApiController : IApiController
+    public class SampleApiController : IApiController, IApiCallBack
     {
         private LOG<SampleApiController> _log = new();
 
@@ -81,9 +81,12 @@ namespace SimpleApi.handler
             await Task.CompletedTask;
         }
 
-        public IApiController Instance()
+
+        public async Task OnDisconnect(IApiSender apiSender)
         {
-            return GlobalServiceProvider.Instance.GetService<SampleApiController>()! ;
+            _log.Debug(()=>$"OnDisconnect - [accountId:{apiSender.AccountId}]");
+            await Task.CompletedTask;
+
         }
     }
 }

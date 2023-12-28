@@ -1,6 +1,5 @@
 ﻿using PlayHouse.Production.Api;
 using PlayHouse.Production;
-using Microsoft.Extensions.DependencyInjection;
 using Simple;
 using PlayHouse.Utils;
 using SimpleProtocol;
@@ -140,9 +139,5 @@ namespace SimpleApi.handler
             await Task.CompletedTask;
         }
 
-        public IApiController Instance()
-        {
-            return GlobalServiceProvider.Instance.GetService<SampleApiForRoom>()!;
-        }
     }
 }
