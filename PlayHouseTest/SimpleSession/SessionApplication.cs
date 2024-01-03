@@ -27,14 +27,15 @@ class SessionApplication
                 ServerSystem = (systemPanel, sender) => new SessionSystem(systemPanel, sender),
                 RequestTimeoutSec = 0,
                 NodeId = 0,
+                
             };
 
             var sessionOption = new SessionOption
             {
                 SessionPort = 10114,
-                ClientSessionIdleTimeout = 0,
                 UseWebSocket = false,
-                Urls = new List<string> { $"{apiSvcId}:{AuthenticateReq.Descriptor.Index}" }
+                Urls = new List<string> { $"{apiSvcId}:{AuthenticateReq.Descriptor.Index}" },
+                ClientIdleTimeoutMSec = 10000
             };
             
             

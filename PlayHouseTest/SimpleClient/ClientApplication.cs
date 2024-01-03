@@ -30,8 +30,11 @@ namespace SimpleClient
 
         public async Task RunAsync()
         {
+            bool debugMode = false;
             var connector = new Connector();
-            connector.Init(new ConnectorConfig() { RequestTimeout = 3, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114 });
+            connector.Init(new ConnectorConfig() { 
+                RequestTimeoutMs = 3000, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114 ,HeartBeatIntervalMs = 0,ConnectionIdleTimeoutMs = 0
+            });
 
             connector.OnReceive += (serviceId, packet) =>
             {
@@ -69,13 +72,13 @@ namespace SimpleClient
             thread.Start();
             //_timer = new Timer((arg) => { connector.MainThreadAction();}, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(10));
             
-            bool result = await connector.ConnectAsync();
-            String accountId = RandomStringGenerator.GenerateRandomString();
+            bool result = await connector.ConnectAsync(debugMode);
+            string accountId = RandomStringGenerator.GenerateRandomString();
             _log.Info(()=>$"onConnect - [accountId:{accountId},result:{result}]");
 
             try
             {
-                var response = await connector.RequestAsync(_apiSvcId,
+                var response = await connector.AuthenticateAsync(_apiSvcId,
                     new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
 
                 var authenticateRes = AuthenticateRes.Parser.ParseFrom(response.Data);
@@ -102,12 +105,12 @@ namespace SimpleClient
                 await Task.Delay(1000);
             
             
-                await connector.ConnectAsync();
+                await connector.ConnectAsync(debugMode);
                 _log.Info(()=>"Reconnect");
                 Thread.Sleep(TimeSpan.FromSeconds(2));
 
                 _log.Info(() => $"before AuthenticateReq - [accountId:{accountId}]");
-                response = await connector.RequestAsync(_apiSvcId, new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
+                response = await connector.AuthenticateAsync(_apiSvcId, new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
                 
                  authenticateRes = AuthenticateRes.Parser.ParseFrom(response.Data);
                   _log.Info(()=>$"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");

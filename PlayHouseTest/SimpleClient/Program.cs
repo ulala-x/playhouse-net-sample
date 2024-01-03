@@ -38,7 +38,7 @@ namespace SimpleClient
             }
 
             await Task.WhenAll(tasks);
-            Environment.Exit(0);
+            //Environment.Exit(0);
 
             // var client = new ClientApplication();
             // await client.RunAsync();
