@@ -35,7 +35,7 @@ class SessionApplication
                 SessionPort = 10114,
                 UseWebSocket = false,
                 Urls = new List<string> { $"{apiSvcId}:{AuthenticateReq.Descriptor.Index}" },
-                ClientIdleTimeoutMSec = 10000
+                ClientIdleTimeoutMSec = 5000
             };
             
             

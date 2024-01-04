@@ -33,7 +33,7 @@ namespace SimpleClient
             bool debugMode = false;
             var connector = new Connector();
             connector.Init(new ConnectorConfig() { 
-                RequestTimeoutMs = 3000, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114 ,HeartBeatIntervalMs = 0,ConnectionIdleTimeoutMs = 0
+                RequestTimeoutMs = 3000, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114 ,HeartBeatIntervalMs = 1000,ConnectionIdleTimeoutMs = 4000
             });
 
             connector.OnReceive += (serviceId, packet) =>
@@ -60,6 +60,11 @@ namespace SimpleClient
             {
                 _log.Info(()=>"onDisconnect");
             };
+
+            //connector.OnError += (serviceId,errorCode,request) =>
+            //{
+
+            //};
 
             Thread thread = new Thread(() =>
             {
@@ -166,26 +171,26 @@ namespace SimpleClient
                     _log.Debug(() =>
                         $"createJoinRoomLeaveRes - [data:{createJoinRoomLeaveRes.Data}]");
                 }
-                //
-                // try
-                // {
-                //     await connector.RequestAsync(_apiSvcId, new Packet(new TestNotRegisterReq() ));
-                // }
-                // catch (PlayConnectorException ex)
-                // {
-                //     _log.Error(()=>$"Request Error - [accountId:{accountId},{ex.Message}]");
-                // }
-                //
-                // try
-                // {
-                //     await connector.RequestAsync(_apiSvcId, new Packet(new TestTimeoutReq() ));
-                // }
-                // catch (PlayConnectorException ex)
-                // {
-                //     _log.Error(()=>$"Request Error - [accountId:{accountId},{ex.Message}]");
-                // }
-            
-              
+
+                try
+                {
+                    await connector.RequestAsync(_apiSvcId, new Packet(new TestNotRegisterReq()));
+                }
+                catch (PlayConnectorException ex)
+                {
+                    _log.Error(() => $"Request Error - [accountId:{accountId},{ex.Message}]");
+                }
+
+                try
+                {
+                    await connector.RequestAsync(_apiSvcId, new Packet(new TestTimeoutReq()));
+                }
+                catch (PlayConnectorException ex)
+                {
+                    _log.Error(() => $"Request Error - [accountId:{accountId},{ex.Message}]");
+                }
+
+
             }
             catch (PlayConnectorException ex)
             {
@@ -196,7 +201,7 @@ namespace SimpleClient
                 _log.Error(()=>$"Exception- [accountId:{accountId},ex:{ex}]");
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(3));
+            await Task.Delay(TimeSpan.FromSeconds(6));
             //Environment.Exit(0);
             
             _log.Info(()=>"finish");
