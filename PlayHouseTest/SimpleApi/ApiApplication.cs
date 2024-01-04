@@ -44,7 +44,7 @@ namespace SimpleApi
                     RedisPort = 16379,
                     RequestTimeoutSec = 0,
                     NodeId = 1,
-                    PacketProducer = (int msgId,IPayload paylaod,bool isRequest) => new SimplePacket(msgId,paylaod,isRequest)
+                    PacketProducer = (int msgId,IPayload paylaod,ushort msgSeq) => new SimplePacket(msgId,paylaod, msgSeq)
                 };
                 var apiOption = new ApiOption
                 {
