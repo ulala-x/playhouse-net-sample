@@ -30,9 +30,25 @@ namespace SimpleApi.Filter
             _log.Debug(() => $"from client - [accountId:{sender.AccountId}, transfered:{simplePacket}]");
 
             await invocation.Proceed();
-            foreach (var transfered in PacketContext.SendPackets)
+            foreach (SendPacketInfo packetInfo in PacketContext.SendPackets)
             {
-                _log.Debug(() => $"send to {transfered.target} - [accountId:{sender.AccountId},transfered:{transfered.packet}]");
+                SendTarget type = packetInfo.Target;
+
+                if(type == SendTarget.ErrorReply)
+                {
+                    _log.Debug(() => $"send to {packetInfo.Target} - [accountId:{sender.AccountId},errorCode:{packetInfo.ErrorCode}]");
+                    
+                }
+                else if(type == SendTarget.Reply)
+                {
+                    _log.Debug(() => $"send to {packetInfo.Target} - [accountId:{sender.AccountId},msgSeq:{packetInfo.MsgSeq},transfered:{packet}]");
+                }
+                else
+                {
+                    _log.Debug(() => $"send to {packetInfo.Target} - [accountId:{sender.AccountId},transfered:{packet}]");
+                }
+
+                
             }
 
             AsyncContext.Clear();
