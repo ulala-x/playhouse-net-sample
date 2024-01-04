@@ -32,7 +32,7 @@ namespace SimplePlay
                     ServerSystem = (systemPanel, sender) => new PlaySystem(systemPanel, sender),
                     RequestTimeoutSec = 0,
                     NodeId = 2,
-                    PacketProducer = (int msgId,IPayload payload,int msgSeq)=>new SimplePacket(msgId,payload,msgSeq)
+                    PacketProducer = (int msgId,IPayload payload)=>new SimplePacket(msgId,payload)
                 };
 
                 var playOption = new PlayOption();

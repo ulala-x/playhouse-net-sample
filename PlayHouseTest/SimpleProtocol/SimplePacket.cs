@@ -37,7 +37,6 @@ namespace SimpleProtocol
         private int _msgId;
         private IPayload _Payload;
         private IMessage? _parsedMessage;
-        private int _msgSeq;
 
 
         public SimplePacket(IMessage message)
@@ -46,21 +45,15 @@ namespace SimpleProtocol
             _Payload = new SimpleProtoPayload(message);
             _parsedMessage = message;
         }
-        public SimplePacket(int msgId,IPayload payload, int msgSeq)
+        public SimplePacket(int msgId,IPayload payload)
         {
             _msgId = msgId;
             _Payload = new CopyPayload(payload);
-            MsgSeq = msgSeq;
         }
 
-        public bool IsRequest()
-        {
-            return _msgSeq > 0;
-        }
 
         public int MsgId => _msgId;
         public IPayload Payload => _Payload;
-        public int MsgSeq { get => _msgSeq; set=> _msgSeq = value; }
 
         private IMessage ParseMessage()
         {
@@ -96,7 +89,7 @@ namespace SimpleProtocol
 
         public IPacket Copy()
         {
-            return new SimplePacket(_msgId, _Payload,_msgSeq);
+            return new SimplePacket(_msgId, _Payload);
         }
     }
 }
