@@ -2,6 +2,7 @@
 using PlayHouseConnector;
 using Simple;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Packet = PlayHouseConnector.Packet;
 
 namespace SimpleClient
@@ -80,6 +81,11 @@ namespace SimpleClient
             bool result = await connector.ConnectAsync(debugMode);
             string accountId = RandomStringGenerator.GenerateRandomString();
             _log.Info(()=>$"onConnect - [accountId:{accountId},result:{result}]");
+
+            if(result == false)
+            {   
+                return;
+            }
 
             try
             {

@@ -1,13 +1,7 @@
 ﻿using Google.Protobuf;
-using Google.Protobuf.Reflection;
 using PlayHouse.Communicator.Message;
-using PlayHouse.Production;
+using PlayHouse.Production.Shared;
 using Simple;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleProtocol
 {
@@ -31,6 +25,7 @@ namespace SimpleProtocol
         {
         }
     }
+
 
     public class SimplePacket : IPacket
     {

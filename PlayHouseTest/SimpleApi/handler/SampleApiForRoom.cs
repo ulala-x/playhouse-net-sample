@@ -3,6 +3,8 @@ using PlayHouse.Production;
 using Simple;
 using PlayHouse.Utils;
 using SimpleProtocol;
+using PlayHouse.Production.Shared;
+using PlayHouse.Service.Shared;
 
 namespace SimpleApi.handler
 {
@@ -16,7 +18,7 @@ namespace SimpleApi.handler
 
         public SampleApiForRoom()
         {
-            _systemPanel = GlobalControlProvider.SystemPanel;
+            _systemPanel = ControlContext.SystemPanel;
         }
 
         private const string RoomSvcId = "room";
@@ -46,7 +48,7 @@ namespace SimpleApi.handler
             var data = packet.Parse<CreateRoomReq>().Data;
             var randRoomServerInfo = _systemPanel!.GetServerInfoByService(RoomServiceId);
 
-            var roomEndpoint = randRoomServerInfo.BindEndpoint();
+            var roomEndpoint = randRoomServerInfo.BindEndpoint;
             var stageId = Interlocked.Increment(ref _stageId).ToString();
 
             var result = await apiSender.CreateStage(roomEndpoint, RoomType, stageId, new SimplePacket(new CreateRoomAsk() { Data = data}));

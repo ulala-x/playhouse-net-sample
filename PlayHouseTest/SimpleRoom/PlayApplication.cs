@@ -1,17 +1,11 @@
-﻿using PlayHouse.Communicator.Message;
-using PlayHouse.Production;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PlayHouse.Communicator.Message;
 using PlayHouse.Production.Play;
-using PlayHouse.Service.Api;
+using PlayHouse.Production.Shared;
 using PlayHouse.Service.Play;
 using Serilog;
-using SimpleConfigure;
 using SimplePlay.Room;
 using SimpleProtocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimplePlay
 {
@@ -23,16 +17,19 @@ namespace SimplePlay
             try
             {
 
-                var redisPort = 16379;
+                ushort apiSvcId = 1;
+                ServiceCollection services = new ServiceCollection();
+
                 var commonOption = new CommonOption()
                 {
                     Port = 10570,
                     ServiceId = 2,
-                    RedisPort = redisPort,
-                    ServerSystem = (systemPanel, sender) => new PlaySystem(systemPanel, sender),
                     RequestTimeoutSec = 0,
                     NodeId = 2,
-                    PacketProducer = (int msgId,IPayload payload,ushort msgSeq)=>new SimplePacket(msgId,payload,msgSeq)
+                    PacketProducer = (int msgId, IPayload payload, ushort msgSeq) => new SimplePacket(msgId, payload, msgSeq),
+                    AddressServerServiceId = apiSvcId,
+                    AddressServerEndpoints = { "10.12.20.59:10470" },
+                    ServiceProvider = services.BuildServiceProvider(),
                 };
 
                 var playOption = new PlayOption();
@@ -47,10 +44,10 @@ namespace SimplePlay
                 var playServer = new PlayServer(commonOption, playOption);
                 playServer.Start();
 
-                AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
+                AppDomain.CurrentDomain.ProcessExit += async (sender, eventArgs) =>
                 {
                     _log.Information("*** shutting down Play server since process is shutting down");
-                    playServer.Stop();
+                    await playServer.StopAsync();
                     _log.Information("*** server shut down");
                     Thread.Sleep(1000);
                 };

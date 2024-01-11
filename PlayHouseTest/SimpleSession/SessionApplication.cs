@@ -1,5 +1,6 @@
-﻿using PlayHouse.Production;
+﻿using Microsoft.Extensions.DependencyInjection;
 using PlayHouse.Production.Session;
+using PlayHouse.Production.Shared;
 using PlayHouse.Service.Session;
 using Serilog;
 using Simple;
@@ -14,20 +15,20 @@ class SessionApplication
     {
         try
         {
-            const int redisPort = 16379;
-
             ushort sessionSvcId = 0;
-            short apiSvcId = 1;
+            ushort apiSvcId = 1;
+
+            ServiceCollection services = new ServiceCollection();
 
             var commonOption = new CommonOption
             {
                 Port = 10370,
                 ServiceId = sessionSvcId,
-                RedisPort = redisPort,
-                ServerSystem = (systemPanel, sender) => new SessionSystem(systemPanel, sender),
                 RequestTimeoutSec = 0,
                 NodeId = 0,
-                
+                AddressServerServiceId = apiSvcId,
+                AddressServerEndpoints = { "10.12.20.59:10470" },
+                ServiceProvider = services.BuildServiceProvider(),
             };
 
             var sessionOption = new SessionOption
@@ -42,10 +43,10 @@ class SessionApplication
             var sessionServer = new SessionServer(commonOption, sessionOption);
             sessionServer.Start();
 
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+            AppDomain.CurrentDomain.ProcessExit += async (sender, e) =>
             {
                 _log.Information("*** shutting down Session server since process is shutting down");
-                sessionServer.Stop();
+                await sessionServer.StopAsync();
                 _log.Information("*** server shut down");
                 Thread.Sleep(1000);
             };

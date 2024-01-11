@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using PlayHouse.Production;
-using PlayHouse.Production.Api;
+﻿using PlayHouse.Production.Api;
+using PlayHouse.Production.Shared;
 using PlayHouse.Utils;
 using Simple;
 using SimpleApi.Filter;
@@ -9,7 +8,7 @@ using SimpleProtocol;
 namespace SimpleApi.handler
 {
     [SimpleAspectify]
-    public class SampleApiController : IApiController, IApiCallBack
+    public class SampleApiController : IApiController, IDisconnectCallback
     {
         private LOG<SampleApiController> _log = new();
 
@@ -41,7 +40,7 @@ namespace SimpleApi.handler
 
             apiSender.Authenticate(accountId);
 
-            var message = new Simple.AuthenticateRes {AccountId = accountId, UserInfo = accountId.ToString() };
+            var message = new Simple.AuthenticateRes { AccountId = accountId, UserInfo = accountId.ToString() };
             apiSender.Reply(new SimplePacket (message));
             await Task.CompletedTask;
         }
@@ -82,11 +81,12 @@ namespace SimpleApi.handler
         }
 
 
-        public async Task OnDisconnect(IApiSender apiSender)
+        public async Task OnDisconnectAsync(IApiSender apiSender)
         {
             _log.Debug(()=>$"OnDisconnect - [accountId:{apiSender.AccountId}]");
             await Task.CompletedTask;
 
         }
+
     }
 }

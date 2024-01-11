@@ -7,58 +7,48 @@ using Microsoft.Extensions.DependencyInjection;
 using ILogger = Serilog.ILogger;
 using SimpleProtocol;
 using PlayHouse.Communicator.Message;
+using PlayHouse.Production.Shared;
+using SimpleApi.System;
 
 namespace SimpleApi
 {
     public class ApiApplication 
     {
         private readonly ILogger _log = Log.Logger;
-        private IServiceCollection Services { get; } = new ServiceCollection();
-
-        public void RegisterService()
-        {
-            // Services.AddLogging(
-            //     builder =>
-            //     {
-            //         builder.AddSerilog(Log.Logger, dispose: true);
-            //         //builder.SetMinimumLevel(LogLevel.Information);
-            //     });
-            Services.AddTransient<SampleApiController>();
-            Services.AddTransient<SampleApiForRoom>();
-
-            GlobalServiceProvider.Instance = Services.BuildServiceProvider();
-        }
 
         public void Run()
         {
             try
             {
-                
+
+                ushort apiSvcId = 1;
+                ServiceCollection services = new ServiceCollection();
+                services.AddScoped<SampleApiController>();
+                services.AddScoped<SampleApiForRoom>();
+                services.AddScoped<SimpleApiSystem>();
+
                 
                 _log.Information("api start");
                 var commonOption = new CommonOption
                 {
-                    ServerSystem = (systemPanel, baseSender) => new ApiSystem(systemPanel, baseSender),
                     Port = 10470,
-                    ServiceId = 1,
-                    RedisPort = 16379,
+                    ServiceId = apiSvcId,
                     RequestTimeoutSec = 0,
                     NodeId = 1,
-                    PacketProducer = (int msgId,IPayload paylaod,ushort msgSeq) => new SimplePacket(msgId,paylaod, msgSeq)
-                };
-                var apiOption = new ApiOption
-                {
-                    ServiceProvider = GlobalServiceProvider.Instance,
+                    PacketProducer = (int msgId,IPayload paylaod,ushort msgSeq) => new SimplePacket(msgId,paylaod, msgSeq),
+                    AddressServerServiceId = apiSvcId,
+                    AddressServerEndpoints = { "10.12.20.59:10470" },
+                    ServiceProvider = services.BuildServiceProvider(),
                 };
 
-
-                var apiServer = new ApiServer(commonOption, apiOption);
+                //AddressServerEndpoints = { "tcp://127.0.0.1:10470" },
+                var apiServer = new ApiServer(commonOption, new ApiOption());
                 apiServer.Start();
 
-                AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
+                AppDomain.CurrentDomain.ProcessExit +=  async (sender, eventArgs) =>
                 {
                     _log.Information("*** shutting down Api server since process is shutting down");
-                    apiServer.Stop();
+                    await apiServer.StopAsync();
                     _log.Information("*** server shut down");
                     Thread.Sleep(1000);
                 };
