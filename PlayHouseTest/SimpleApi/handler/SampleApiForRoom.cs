@@ -48,7 +48,7 @@ namespace SimpleApi.handler
             var data = packet.Parse<CreateRoomReq>().Data;
             var randRoomServerInfo = _systemPanel!.GetServerInfoByService(RoomServiceId);
 
-            var roomEndpoint = randRoomServerInfo.BindEndpoint;
+            var roomEndpoint = randRoomServerInfo.GetBindEndpoint();
             var stageId = Interlocked.Increment(ref _stageId).ToString();
 
             var result = await apiSender.CreateStage(roomEndpoint, RoomType, stageId, new SimplePacket(new CreateRoomAsk() { Data = data}));

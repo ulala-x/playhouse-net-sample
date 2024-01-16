@@ -15,24 +15,42 @@ namespace SimpleApi.System
 
         public ServerInfo(IServerInfo serverInfo)
         {
-            _bindEndpoint = serverInfo.BindEndpoint;
-            _serviceType = serverInfo.ServiceType;
-            _serviceId = serverInfo.ServiceId;
-            _state = serverInfo.State;
-            _lastUpdate = serverInfo.LastUpdate;
-            _actorCount = serverInfo.ActorCount;
+            _bindEndpoint = serverInfo.GetBindEndpoint();
+            _serviceType = serverInfo.GetServiceType();
+            _serviceId = serverInfo.GetServiceId();
+            _state = serverInfo.GetState();
+            _lastUpdate = serverInfo.GetLastUpdate();
+            _actorCount = serverInfo.GetActorCount();
         }
 
-        public string BindEndpoint => _bindEndpoint;
+        public int GetActorCount()
+        {
+           return _actorCount;
+        }
 
-        public ServiceType ServiceType => _serviceType;
+        public string GetBindEndpoint()
+        {
+            return _bindEndpoint;
+        }
 
-        public ushort ServiceId => _serviceId;
+        public long GetLastUpdate()
+        {
+            return _lastUpdate;
+        }
 
-        public ServerState State => _state;
+        public ushort GetServiceId()
+        {
+            return _serviceId;
+        }
 
-        public long LastUpdate => _lastUpdate;
+        public ServiceType GetServiceType()
+        {
+            return _serviceType;
+        }
 
-        public int ActorCount => _actorCount;
+        public ServerState GetState()
+        {
+            return _state;
+        }
     }
 }

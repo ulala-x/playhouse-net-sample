@@ -48,7 +48,7 @@ namespace SimpleApi.System
 
         public async Task<List<IServerInfo>> UpdateServerInfoAsync(IServerInfo serverInfo)
         {
-            _serverInfos.AddOrUpdate(serverInfo.BindEndpoint,(endpoint)=> new ServerInfo(serverInfo),(endpoint,exist)=> new ServerInfo(serverInfo));
+            _serverInfos.AddOrUpdate(serverInfo.GetBindEndpoint(),(endpoint)=> new ServerInfo(serverInfo),(endpoint,exist)=> new ServerInfo(serverInfo));
             await Task.CompletedTask;
 
             return _serverInfos.Values.ToList();
