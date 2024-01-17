@@ -29,7 +29,7 @@ namespace SimpleApi
 
                 
                 _log.Information("api start");
-                var commonOption = new CommonOption
+                var commonOption = new PlayhouseOption
                 {
                     Port = 10470,
                     ServiceId = apiSvcId,

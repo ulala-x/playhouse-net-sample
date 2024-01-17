@@ -20,7 +20,7 @@ namespace SimplePlay
                 ushort apiSvcId = 1;
                 ServiceCollection services = new ServiceCollection();
 
-                var commonOption = new CommonOption()
+                var commonOption = new PlayhouseOption()
                 {
                     Port = 10570,
                     ServiceId = 2,

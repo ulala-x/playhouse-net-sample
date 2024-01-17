@@ -20,7 +20,7 @@ class SessionApplication
 
             ServiceCollection services = new ServiceCollection();
 
-            var commonOption = new CommonOption
+            var commonOption = new PlayhouseOption
             {
                 Port = 10370,
                 ServiceId = sessionSvcId,
