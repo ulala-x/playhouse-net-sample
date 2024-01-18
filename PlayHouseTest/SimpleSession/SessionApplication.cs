@@ -22,12 +22,13 @@ class SessionApplication
 
             var commonOption = new PlayhouseOption
             {
+                Ip = "127.0.0.1",
                 Port = 10370,
                 ServiceId = sessionSvcId,
                 RequestTimeoutSec = 0,
                 NodeId = 0,
                 AddressServerServiceId = apiSvcId,
-                AddressServerEndpoints = { "10.12.20.59:10470" },
+                AddressServerEndpoints = { "127.0.0.1:10470" },
                 ServiceProvider = services.BuildServiceProvider(),
             };
 

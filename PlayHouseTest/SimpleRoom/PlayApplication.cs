@@ -22,13 +22,14 @@ namespace SimplePlay
 
                 var commonOption = new PlayhouseOption()
                 {
+                    Ip = "127.0.0.1",
                     Port = 10570,
                     ServiceId = 2,
                     RequestTimeoutSec = 0,
                     NodeId = 2,
                     PacketProducer = (int msgId, IPayload payload, ushort msgSeq) => new SimplePacket(msgId, payload, msgSeq),
                     AddressServerServiceId = apiSvcId,
-                    AddressServerEndpoints = { "10.12.20.59:10470" },
+                    AddressServerEndpoints = { "127.0.0.1:10470" },
                     ServiceProvider = services.BuildServiceProvider(),
                 };
 

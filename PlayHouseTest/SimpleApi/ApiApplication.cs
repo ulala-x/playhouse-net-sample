@@ -31,13 +31,14 @@ namespace SimpleApi
                 _log.Information("api start");
                 var commonOption = new PlayhouseOption
                 {
+                    Ip = "127.0.0.1",
                     Port = 10470,
                     ServiceId = apiSvcId,
                     RequestTimeoutSec = 0,
                     NodeId = 1,
                     PacketProducer = (int msgId,IPayload paylaod,ushort msgSeq) => new SimplePacket(msgId,paylaod, msgSeq),
                     AddressServerServiceId = apiSvcId,
-                    AddressServerEndpoints = { "10.12.20.59:10470" },
+                    AddressServerEndpoints = { "127.0.0.1:10470" },
                     ServiceProvider = services.BuildServiceProvider(),
                 };
 
