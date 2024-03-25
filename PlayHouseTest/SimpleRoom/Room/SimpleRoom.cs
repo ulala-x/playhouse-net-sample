@@ -106,18 +106,18 @@ namespace SimplePlay.Room
             _userMap[user.GetAccountId()] = user;
             _log.Debug(() => $"OnPostJoinStage - [stageType:{StageSender.StageType},stageId:${StageSender.StageId},accountId:{user.GetAccountId()}]");
 
-            List<Task<(ushort errorCode, IPacket reply)>> requests = new ();
+            List<Task<IPacket>> requests = new ();
             foreach (var item in _userMap.Values)
             {
                 requests.Add(item.ActorSender.RequestToApi(new SimplePacket(new HelloToApiReq() { Data = "Hello" })));
             }
 
-            (ushort errorCode, IPacket reply)[] replys = await Task.WhenAll(requests);
+            IPacket[] replys = await Task.WhenAll(requests);
 
             
             foreach (var reply in replys)
             {
-                var helloRes = reply.reply.Parse<HelloToApiRes>();    
+                var helloRes = reply.Parse<HelloToApiRes>();    
                 _log.Debug(() => $"hello res - [data:{helloRes.Data}]");
             }
 

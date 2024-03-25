@@ -45,14 +45,14 @@ namespace SimpleClient
                 {
                     if(packet.MsgId == SendMsg.Descriptor.Index)
                     {
-                        _log.Debug(()=>$"api SendMsg message - [msgId:{packet.MsgId}, message:{SendMsg.Parser.ParseFrom(packet.Data).Message}]");
+                        _log.Debug(()=>$"api SendMsg message - [msgId:{packet.MsgId}, message:{SendMsg.Parser.ParseFrom(packet.DataSpan).Message}]");
                     }    
                 }
                 else if (serviceId == _playSvcId)
                 {
                     if(packet.MsgId == ChatMsg.Descriptor.Index) 
                     {
-                        _log.Debug(()=>$"stage chat msg -  [msgId:{packet.MsgId},data:{ChatMsg.Parser.ParseFrom(packet.Data).Data}]");
+                        _log.Debug(()=>$"stage chat msg -  [msgId:{packet.MsgId},data:{ChatMsg.Parser.ParseFrom(packet.DataSpan).Data}]");
                     }
                 }
             };
@@ -92,7 +92,7 @@ namespace SimpleClient
                 var response = await connector.AuthenticateAsync(_apiSvcId,
                     new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
 
-                var authenticateRes = AuthenticateRes.Parser.ParseFrom(response.Data);
+                var authenticateRes = AuthenticateRes.Parser.ParseFrom(response.DataSpan);
                 _log.Debug(()=>$"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
 
                  int offSet = 2;
@@ -107,7 +107,7 @@ namespace SimpleClient
                      var helloRes = await connector.RequestAsync(_apiSvcId, new Packet(new HelloReq() { Message = "hi!" }));
 
                     _log.Debug(() =>
-                        $"response message - [accountId:{accountId},count:{i},message:{HelloRes.Parser.ParseFrom(helloRes.Data).Message}]");
+                        $"response message - [accountId:{accountId},count:{i},message:{HelloRes.Parser.ParseFrom(helloRes.DataSpan).Message}]");
                 }
                 
                 
@@ -123,7 +123,7 @@ namespace SimpleClient
                 _log.Info(() => $"before AuthenticateReq - [accountId:{accountId}]");
                 response = await connector.AuthenticateAsync(_apiSvcId, new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
                 
-                 authenticateRes = AuthenticateRes.Parser.ParseFrom(response.Data);
+                 authenticateRes = AuthenticateRes.Parser.ParseFrom(response.DataSpan);
                   _log.Info(()=>$"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
                 
                 for (int i = 0; i < 10; ++i)
@@ -131,7 +131,7 @@ namespace SimpleClient
                     response = await connector.RequestAsync(_apiSvcId,
                         new Packet(new CreateRoomReq() { Data = "success 1" }));
 
-                    var createRoomRes = CreateRoomRes.Parser.ParseFrom(response.Data);
+                    var createRoomRes = CreateRoomRes.Parser.ParseFrom(response.DataSpan);
                     var stageId = createRoomRes.StageId;
                     var playEndpoint = createRoomRes.PlayEndpoint;
 
@@ -143,13 +143,13 @@ namespace SimpleClient
                         { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 2" }));
 
 
-                    var joinRoomRes = JoinRoomRes.Parser.ParseFrom(response.Data);
+                    var joinRoomRes = JoinRoomRes.Parser.ParseFrom(response.DataSpan);
                     _log.Debug(() =>
                         $"JoinRoomRes - [stageIndex:{joinRoomRes.StageIdx},data:{joinRoomRes.Data}]");
 
                     response = await connector.RequestAsync(_playSvcId,
                         new Packet(new LeaveRoomReq() { Data = "success 3" }));
-                    var leaveRoomRes = LeaveRoomRes.Parser.ParseFrom(response.Data);
+                    var leaveRoomRes = LeaveRoomRes.Parser.ParseFrom(response.DataSpan);
 
                     _log.Debug(() =>
                         $"LeaveRoomRes - [data:{leaveRoomRes.Data}]");
@@ -162,7 +162,7 @@ namespace SimpleClient
                         new Packet(new CreateJoinRoomReq()
                         { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 4" }));
 
-                    var createJoinRoomRes = CreateJoinRoomRes.Parser.ParseFrom(response.Data);
+                    var createJoinRoomRes = CreateJoinRoomRes.Parser.ParseFrom(response.DataSpan);
 
                     _log.Debug(() =>
                         $"createJoinRoomRes - [stageIndex:{createJoinRoomRes.StageIdx},data:{createJoinRoomRes.Data}]");
@@ -173,7 +173,7 @@ namespace SimpleClient
                     response = await connector.RequestAsync(_playSvcId,
                         new Packet(new LeaveRoomReq() { Data = "success 5" }));
 
-                    var createJoinRoomLeaveRes = LeaveRoomRes.Parser.ParseFrom(response.Data);
+                    var createJoinRoomLeaveRes = LeaveRoomRes.Parser.ParseFrom(response.DataSpan);
                     _log.Debug(() =>
                         $"createJoinRoomLeaveRes - [data:{createJoinRoomLeaveRes.Data}]");
                 }

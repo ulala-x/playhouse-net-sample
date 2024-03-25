@@ -19,7 +19,8 @@ namespace SimpleProtocol
             return _proto;
         }
 
-        public ReadOnlySpan<byte> Data => _proto.ToByteArray();
+        public ReadOnlyMemory<byte> Data => _proto.ToByteArray();
+
 
         public void Dispose()
         {
@@ -30,7 +31,7 @@ namespace SimpleProtocol
     public class SimplePacket : IPacket
     {
         private int _msgId;
-        private IPayload _Payload;
+        private IPayload _payload;
         private IMessage? _parsedMessage;
         private ushort _msgSeq;
 
@@ -38,19 +39,19 @@ namespace SimpleProtocol
         public SimplePacket(IMessage message)
         {
             _msgId = message.Descriptor.Index;
-            _Payload = new SimpleProtoPayload(message);
+            _payload = new SimpleProtoPayload(message);
             _parsedMessage = message;
         }
         public SimplePacket(int msgId,IPayload payload,ushort msgSeq)
         {
             _msgId = msgId;
-            _Payload = new CopyPayload(payload);
+            _payload = new CopyPayload(payload);
             _msgSeq = msgSeq;
         }
 
         public bool IsRequest => _msgSeq > 0;
         public int MsgId => _msgId;
-        public IPayload Payload => _Payload;
+        public IPayload Payload => _payload;
 
         private IMessage ParseMessage()
         {
@@ -61,7 +62,7 @@ namespace SimpleProtocol
                 throw new Exception($"msgId is not invalid - [msgId:{MsgId}]");
             }
 
-            return  messageType.Parser.ParseFrom(_Payload.Data);
+            return  messageType.Parser.ParseFrom(_payload.DataSpan);
         }
 
         public override string ToString() 
@@ -86,7 +87,12 @@ namespace SimpleProtocol
 
         public IPacket Copy()
         {
-            return new SimplePacket(_msgId, new CopyPayload(_Payload),_msgSeq);
+            return new SimplePacket(_msgId, new CopyPayload(_payload),_msgSeq);
+        }
+
+        public void Dispose()
+        {
+            _payload.Dispose();
         }
     }
 }
