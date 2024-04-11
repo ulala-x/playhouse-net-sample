@@ -12,7 +12,7 @@ namespace SimpleApi.handler
     {
         private LOG<SampleApiController> _log = new();
 
-        public  void Handles(IHandlerRegister register, IBackendHandlerRegister backendRegister)
+        public  void Handles(IHandlerRegister register)
         {
             register.Add(AuthenticateReq.Descriptor.Index, Authenticate);
             register.Add(HelloReq.Descriptor.Index, Hello);

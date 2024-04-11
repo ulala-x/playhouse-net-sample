@@ -1,7 +1,6 @@
 ﻿using PlayHouse.Service.Api;
 using Serilog;
 using SimpleApi.handler;
-using PlayHouse.Production;
 using PlayHouse.Production.Api;
 using Microsoft.Extensions.DependencyInjection;
 using ILogger = Serilog.ILogger;
@@ -9,6 +8,7 @@ using SimpleProtocol;
 using PlayHouse.Communicator.Message;
 using PlayHouse.Production.Shared;
 using SimpleApi.System;
+using SimpleApi.Filter;
 
 namespace SimpleApi
 {
@@ -24,6 +24,7 @@ namespace SimpleApi
                 ushort apiSvcId = 1;
                 ServiceCollection services = new ServiceCollection();
                 services.AddScoped<SampleApiController>();
+                services.AddScoped<SampleBackendApiForRoom>();
                 services.AddScoped<SampleApiForRoom>();
                 services.AddScoped<SimpleApiSystem>();
 
@@ -42,8 +43,8 @@ namespace SimpleApi
                     ServiceProvider = services.BuildServiceProvider(),
                 };
 
-                //AddressServerEndpoints = { "tcp://127.0.0.1:10470" },
-                var apiServer = new ApiServer(commonOption, new ApiOption());
+                ApiOption apiOption = new ApiOption();
+                var apiServer = new ApiServer(commonOption, apiOption);
                 apiServer.Start();
 
                 AppDomain.CurrentDomain.ProcessExit +=  async (sender, eventArgs) =>

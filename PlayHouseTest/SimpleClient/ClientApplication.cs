@@ -1,8 +1,6 @@
 ﻿using PlayHouse.Utils;
 using PlayHouseConnector;
 using Simple;
-using System;
-using System.Diagnostics.CodeAnalysis;
 using Packet = PlayHouseConnector.Packet;
 
 namespace SimpleClient

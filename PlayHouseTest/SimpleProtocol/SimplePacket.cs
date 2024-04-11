@@ -1,7 +1,6 @@
 ﻿using Google.Protobuf;
 using PlayHouse.Communicator.Message;
 using PlayHouse.Production.Shared;
-using Simple;
 
 namespace SimpleProtocol
 {
@@ -25,6 +24,28 @@ namespace SimpleProtocol
         public void Dispose()
         {
         }
+    }
+
+    public static class SimplePacketExtention
+    {
+        public static T Parse<T>(this IPacket packet) where T : IMessage, new()
+        {
+            SimplePacket packetObject = (packet as SimplePacket)!;
+            return packetObject.Parse<T>();
+        }
+
+        public static string GetMsgName(this IPacket packet)
+        {
+            SimplePacket packetObject = (packet as SimplePacket)!;
+            return packetObject.GetMsgName();
+        }
+
+        public static IPacket Copy(this IPacket packet)
+        {
+            SimplePacket packetObject = (packet as SimplePacket)!;
+            return new SimplePacket(packet.MsgId, new CopyPayload(packet.Payload), packetObject.MsgSeq);
+        }
+
     }
 
 
@@ -52,44 +73,32 @@ namespace SimpleProtocol
         public bool IsRequest => _msgSeq > 0;
         public int MsgId => _msgId;
         public IPayload Payload => _payload;
+        public ushort MsgSeq => _msgSeq;
 
-        private IMessage ParseMessage()
-        {
-            var messageType = SimpleReflection.Descriptor.MessageTypes[MsgId];
-
-            if (messageType == null)
-            {
-                throw new Exception($"msgId is not invalid - [msgId:{MsgId}]");
-            }
-
-            return  messageType.Parser.ParseFrom(_payload.DataSpan);
-        }
-
-        public override string ToString() 
-        {
-            if( _parsedMessage == null )
-            {
-                _parsedMessage = ParseMessage();
-            }
-            return _parsedMessage.ToString() ?? string.Empty     ;
-
-        }
-
-        public T Parse<T>() 
+        public override string ToString()
         {
             if (_parsedMessage == null)
             {
-                _parsedMessage = ParseMessage();
+                //_parsedMessage = ParseMessage();
+                return string.Empty;
+            }
+            return _parsedMessage.ToString() ?? string.Empty;
+
+        }
+
+        public T Parse<T>() where T : IMessage, new()
+        {
+            if (_parsedMessage == null)
+            {
+                T message = new T();
+                //message.MergeFrom(_Payload.DataSpan);
+                //_parsedMessage = message;
+                _parsedMessage = message.Descriptor.Parser.ParseFrom(_payload.DataSpan);
+                //_parsedMessage = ParseMessage();
             }
 
-            return (T) _parsedMessage;
+            return (T)_parsedMessage;
         }
-
-        public IPacket Copy()
-        {
-            return new SimplePacket(_msgId, new CopyPayload(_payload),_msgSeq);
-        }
-
         public void Dispose()
         {
             _payload.Dispose();
