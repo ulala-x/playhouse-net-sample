@@ -11,7 +11,6 @@ public class SampleApiForRoom : IApiController
 {
     private LOG<SampleApiForRoom> _log = new();
     private readonly ISystemPanel _systemPanel;
-    private static long _stageId = 1;
 
     public SampleApiForRoom()
     {
@@ -114,7 +113,7 @@ public class SampleApiForRoom : IApiController
     }
 }
 
-public class SampleBackendApiForRoom : IBackendApiController
+public class SampleBackendApiForRoom : IApiBackendController
 {
     private LOG<SampleBackendApiForRoom> _log = new();
 
