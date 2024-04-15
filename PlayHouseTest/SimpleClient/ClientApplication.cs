@@ -146,7 +146,7 @@ namespace SimpleClient
                     _log.Debug(() =>
                         $"JoinRoomRes - [stageId:{stageId},data:{joinRoomRes.Data}]");
 
-                    response = await connector.RequestExAsync(_playSvcId,stageId,
+                    response = await connector.RequestAsync(_playSvcId,stageId,
                         new Packet(new LeaveRoomReq() { Data = "success 3" }));
                     var leaveRoomRes = LeaveRoomRes.Parser.ParseFrom(response.DataSpan);
 
@@ -167,10 +167,10 @@ namespace SimpleClient
                     _log.Debug(() =>
                         $"JoinRoomRes - [stageId: {stageId},data:{createJoinRoomRes.Data}]");
 
-                    connector.SendEx(_playSvcId,stageId, new Packet(new ChatMsg() { Data = "hi!" }));
+                    connector.Send(_playSvcId,stageId, new Packet(new ChatMsg() { Data = "hi!" }));
                     connector.Send(_apiSvcId, new Packet(new SendMsg() { Message = "hello!!" }));
 
-                    response = await connector.RequestExAsync(_playSvcId, stageId,
+                    response = await connector.RequestAsync(_playSvcId, stageId,
                         new Packet(new LeaveRoomReq() { Data = "success 5" }));
 
                     var createJoinRoomLeaveRes = LeaveRoomRes.Parser.ParseFrom(response.DataSpan);
