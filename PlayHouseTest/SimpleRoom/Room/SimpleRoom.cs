@@ -11,7 +11,7 @@ namespace SimplePlay.Room
     {
         private LOG<SimpleRoom> _log = new();
         private PacketHandler<SimpleRoom, SimpleUser> _handler = new ();
-        private Dictionary<string,SimpleUser> _userMap = new ();
+        private Dictionary<long,SimpleUser> _userMap = new ();
         private int _count;
         private IStageSender _stageSender;
 
@@ -20,8 +20,8 @@ namespace SimplePlay.Room
         public SimpleRoom(IStageSender stageSender)
         {
             _stageSender = stageSender;
-            _handler.Add(LeaveRoomReq.Descriptor.Index, new LeaveRoomCmd());
-            _handler.Add(ChatMsg.Descriptor.Index, new ChatMsgCmd());
+            _handler.Add(LeaveRoomReq.Descriptor.Name, new LeaveRoomCmd());
+            _handler.Add(ChatMsg.Descriptor.Name, new ChatMsgCmd());
 
             StageSender.AddCountTimer(TimeSpan.FromSeconds(3), 3, TimeSpan.FromSeconds(1), TimerCounter);
             StageSender.AddRepeatTimer(TimeSpan.FromSeconds(0),TimeSpan.FromMilliseconds(200), async () =>
@@ -50,15 +50,15 @@ namespace SimplePlay.Room
         public async Task OnDisconnect(IActor actor)
         {
             SimpleUser user =(SimpleUser) actor;
-            _log.Debug(() => $"OnDisconnect - [stageType:{StageSender.StageType},stageId:{StageSender.StageId},accountId:{user.GetAccountId()}]");
+            _log.Debug(() => $"OnDisconnect - [stageType:{StageSender.StageType},stageId:{StageSender.StageId},accountId:{user.AccountId}]");
             LeaveRoom(user);
             await Task.CompletedTask;
         }
 
         public void LeaveRoom(SimpleUser user)
         {
-            _userMap.Remove(user.GetAccountId());
-            _log.Debug(() => $"leave room {user.GetAccountId()}, size:{_userMap.Count}");
+            _userMap.Remove(user.AccountId);
+            _log.Debug(() => $"leave room {user.AccountId}, size:{_userMap.Count}");
 
             if(_userMap.Count == 0)
             {
@@ -103,8 +103,8 @@ namespace SimplePlay.Room
         {
             SimpleUser user = (SimpleUser)actor;
 
-            _userMap[user.GetAccountId()] = user;
-            _log.Debug(() => $"OnPostJoinStage - [stageType:{StageSender.StageType},stageId:${StageSender.StageId},accountId:{user.GetAccountId()}]");
+            _userMap[user.AccountId] = user;
+            _log.Debug(() => $"OnPostJoinStage - [stageType:{StageSender.StageType},stageId:${StageSender.StageId},accountId:{user.AccountId}]");
 
             List<Task<IPacket>> requests = new ();
             foreach (var item in _userMap.Values)

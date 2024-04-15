@@ -37,7 +37,7 @@ namespace SimpleApi
                     ServiceId = apiSvcId,
                     RequestTimeoutSec = 0,
                     NodeId = 1,
-                    PacketProducer = (int msgId,IPayload paylaod,ushort msgSeq) => new SimplePacket(msgId,paylaod, msgSeq),
+                    PacketProducer = (string msgId,IPayload paylaod,ushort msgSeq) => new SimplePacket(msgId,paylaod, msgSeq),
                     AddressServerServiceId = apiSvcId,
                     AddressServerEndpoints = { "127.0.0.1:10470" },
                     ServiceProvider = services.BuildServiceProvider(),

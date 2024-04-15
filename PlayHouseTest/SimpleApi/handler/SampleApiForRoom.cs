@@ -23,23 +23,23 @@ public class SampleApiForRoom : IApiController
 
     public void Handles(IHandlerRegister register)
     {
-        register.Add(CreateRoomReq.Descriptor.Index, CreateStage);
-        register.Add(JoinRoomReq.Descriptor.Index, JoinStage);
-        register.Add(CreateJoinRoomReq.Descriptor.Index, CreateJoinStage);
+        register.Add(CreateRoomReq.Descriptor.Name, CreateStage);
+        register.Add(JoinRoomReq.Descriptor.Name, JoinStage);
+        register.Add(CreateJoinRoomReq.Descriptor.Name, CreateJoinStage);
     }
 
     private async Task CreateStage(IPacket packet, IApiSender apiSender)
     {
 
         _log.Debug(()=>
-            $"CreateRoom - accountId:{apiSender.AccountId}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(mt => mt.Index == packet.MsgId).Name}"
+            $"CreateRoom - accountId:{apiSender.AccountId}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(mt => mt.Name == packet.MsgId).Name}"
         );
 
         var data = packet.Parse<CreateRoomReq>().Data;
         var randRoomServerInfo = _systemPanel!.GetServerInfoBy(RoomServiceId);
 
         var roomEndpoint = randRoomServerInfo.GetBindEndpoint();
-        var stageId = Interlocked.Increment(ref _stageId).ToString();
+        long stageId = _systemPanel.GenerateUUID();
 
         CreateStageResult result = await apiSender.CreateStage(roomEndpoint, RoomType, stageId, new SimplePacket(new CreateRoomAsk() { Data = data}));
 
@@ -51,8 +51,8 @@ public class SampleApiForRoom : IApiController
         {
             apiSender.Reply(new SimplePacket(new CreateRoomRes() {
                     Data = createRoomAnswer.Data,
-                    StageId = stageId,
                     PlayEndpoint = roomEndpoint,
+                    StageId = stageId,
             }));
         }
         else
@@ -63,12 +63,14 @@ public class SampleApiForRoom : IApiController
 
     private async Task JoinStage(IPacket packet, IApiSender apiSender)
     {
-        _log.Debug(() => $"joinRoom - accountId:{apiSender.AccountId}, sid:{apiSender.Sid}, msgName:{SimpleReflection.Descriptor.MessageTypes.First(x => x.Index == packet.MsgId).Name}");
+        
 
         var request = packet.Parse<JoinRoomReq>();
         string data = request.Data;
-        string stageId = request.StageId;
+        long stageId = request.StageId;
         string roomEndpoint = request.PlayEndpoint;
+
+        _log.Debug(() => $"joinRoom - accountId:{apiSender.AccountId},sid:{apiSender.Sid},stageId:{stageId} msgName:{SimpleReflection.Descriptor.MessageTypes.First(x => x.Name == packet.MsgId).Name}");
 
 
         JoinStageResult result = await apiSender.JoinStage(roomEndpoint, stageId, new SimplePacket(new JoinRoomAsk() { Data = data }));
@@ -77,8 +79,7 @@ public class SampleApiForRoom : IApiController
         {
             var joinRoomAnswer = result.JoinStageRes.Parse<JoinRoomAnswer>();
             apiSender.Reply(new SimplePacket(new JoinRoomRes{
-                    Data = joinRoomAnswer.Data,
-                    StageIdx = result.StageIndex,
+                    Data = joinRoomAnswer.Data
             }));
         }
         else
@@ -89,11 +90,11 @@ public class SampleApiForRoom : IApiController
 
     private async Task CreateJoinStage(IPacket packet, IApiSender apiSender)
     {
-        _log.Debug(() => $"CreateJoinRoomReq - accountId:{apiSender.AccountId},sid:{apiSender.Sid},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
+        _log.Debug(() => $"CreateJoinRoomReq - accountId:{apiSender.AccountId},sid:{apiSender.Sid},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Name == packet.MsgId).Name}");
 
         var request = packet.Parse<CreateJoinRoomReq>();
         var data = request.Data;
-        string stageId = request.StageId;
+        long stageId = _systemPanel.GenerateUUID(); 
         var roomEndpoint = request.PlayEndpoint;
         var createPayload = new SimplePacket(new CreateRoomAsk() { Data = data,});
         
@@ -104,7 +105,7 @@ public class SampleApiForRoom : IApiController
         {
             //var joinRoomAnswer = CreateJoinRoomAnswer.Parser.ParseFrom(result.JoinStageRes.Payload.Data);
             var joinRoomAnswer = result.JoinStageRes.Parse<JoinRoomAnswer>();
-            apiSender.Reply(new SimplePacket(new CreateJoinRoomRes() { Data = joinRoomAnswer.Data, StageIdx = result.StageIndex }));
+            apiSender.Reply(new SimplePacket(new CreateJoinRoomRes() { Data = joinRoomAnswer.Data, StageId= stageId }));
         }
         else
         {
@@ -123,14 +124,14 @@ public class SampleBackendApiForRoom : IBackendApiController
 
     public void Handles(IBackendHandlerRegister backendRegister)
     {
-        backendRegister.Add(LeaveRoomNotify.Descriptor.Index, LeaveRoomNoti);
-        backendRegister.Add(HelloToApiReq.Descriptor.Index, HelloToApi);
+        backendRegister.Add(LeaveRoomNotify.Descriptor.Name, LeaveRoomNoti);
+        backendRegister.Add(HelloToApiReq.Descriptor.Name, HelloToApi);
     }
 
 
     private async Task LeaveRoomNoti(IPacket packet, IApiBackendSender backendSender)
     {
-        _log.Debug(() => $"LeaveRoomNoti : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
+        _log.Debug(() => $"LeaveRoomNoti : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Name == packet.MsgId).Name}");
 
 
         var notify = packet.Parse<LeaveRoomNotify>();
@@ -140,7 +141,7 @@ public class SampleBackendApiForRoom : IBackendApiController
 
     private async Task HelloToApi(IPacket packet, IApiBackendSender backendSender)
     {
-        _log.Debug(() => $"HelloToApi : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Index == packet.MsgId).Name}");
+        _log.Debug(() => $"HelloToApi : accountId:{backendSender.AccountId},msgName:{SimpleReflection.Descriptor.MessageTypes.Single(m => m.Name == packet.MsgId).Name}");
 
         string data = packet.Parse<HelloToApiReq>().Data;
         backendSender.Reply(new SimplePacket(new HelloToApiRes { Data = data }));

@@ -15,11 +15,11 @@ internal class Program
         {
             File.Delete(logFilePath);
         }
-        LoggerConfigure.SetLogger(new SimpleLogger(),LogLevel.Trace);
+        LoggerConfigure.SetLogger(new SimpleLogger(),LogLevel.Debug);
         // Serilog 구성
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Verbose()
-            .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information) 
+            .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose) 
             .WriteTo.Async(a => a.File(logFilePath, shared: true, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose))
             .CreateLogger();
 

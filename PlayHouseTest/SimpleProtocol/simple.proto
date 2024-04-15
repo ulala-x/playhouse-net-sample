@@ -10,7 +10,7 @@ message AuthenticateReq{
 
 //msgId = 1
 message AuthenticateRes{
-	string account_id = 1;
+  int64 account_id = 1;
   string userInfo = 3;
 }
 
@@ -40,33 +40,31 @@ message CreateRoomReq{
 }
 //msgId = 7
 message CreateRoomRes{
-  string stage_id = 1;
+  int64 stage_id = 1;
   string data = 2;
   string playEndpoint = 3;
 }
 //msgId = 8
 message JoinRoomReq{
   string playEndpoint = 1;
-  string stage_id = 2;
-  bytes account_id = 3;
+  int64 stage_id = 2;
+  int64 account_id = 3;
   string data = 4;
 }
 //msgId = 9
 message JoinRoomRes{
-  int32 stage_idx = 1;
-  string data = 2;
+  string data = 1;
 }
 //msgId = 10
 message CreateJoinRoomReq {
   string playEndpoint = 1;
-  string stage_id = 2;
-  string account_id = 3;
-  string data = 4;
+  int64 account_id = 2;
+  string data = 3;
 }
 //msgId = 11
 message CreateJoinRoomRes {
-  int32 stage_idx = 1;
-  string data = 2;
+  string data = 1;
+  int64 stage_id = 2;
 }
 //msgId = 12
 message LeaveRoomNotify{
