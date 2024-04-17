@@ -42,14 +42,14 @@ namespace SimpleClient
 
                 if (serviceId == _apiSvcId)
                 {
-                    if(packet.MsgId == SendMsg.Descriptor.Name)
+                    if(packet.MsgId == SendMsg.Descriptor.Index)
                     {
                         _log.Debug(()=>$"api SendMsg message - [msgId:{packet.MsgId}, message:{SendMsg.Parser.ParseFrom(packet.DataSpan).Message}]");
                     }    
                 }
                 else if (serviceId == _playSvcId)
                 {
-                    if(packet.MsgId == ChatMsg.Descriptor.Name) 
+                    if(packet.MsgId == ChatMsg.Descriptor.Index) 
                     {
                         _log.Debug(()=>$"stage chat msg -  [msgId:{packet.MsgId},data:{ChatMsg.Parser.ParseFrom(packet.DataSpan).Data}]");
                     }

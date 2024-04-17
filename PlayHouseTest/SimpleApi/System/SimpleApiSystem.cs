@@ -15,7 +15,7 @@ namespace SimpleApi.System
 
         public void Handles(ISystemHandlerRegister handlerRegister)
         {
-            handlerRegister.Add(HelloReq.Descriptor.Name, Hello);
+            handlerRegister.Add(HelloReq.Descriptor.Index, Hello);
         }
 
 
@@ -25,7 +25,7 @@ namespace SimpleApi.System
 
             try
             {
-                if (packet.MsgId == HelloReq.Descriptor.Name)
+                if (packet.MsgId == HelloReq.Descriptor.Index)
                 {
                     var message = packet.Parse<HelloReq>().Message;
                     sender.Reply(new SimplePacket(new HelloRes { Message = message }));

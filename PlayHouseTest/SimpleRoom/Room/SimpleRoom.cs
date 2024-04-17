@@ -20,8 +20,8 @@ namespace SimplePlay.Room
         public SimpleRoom(IStageSender stageSender)
         {
             _stageSender = stageSender;
-            _handler.Add(LeaveRoomReq.Descriptor.Name, new LeaveRoomCmd());
-            _handler.Add(ChatMsg.Descriptor.Name, new ChatMsgCmd());
+            _handler.Add(LeaveRoomReq.Descriptor.Index, new LeaveRoomCmd());
+            _handler.Add(ChatMsg.Descriptor.Index, new ChatMsgCmd());
 
             StageSender.AddCountTimer(TimeSpan.FromSeconds(3), 3, TimeSpan.FromSeconds(1), TimerCounter);
             StageSender.AddRepeatTimer(TimeSpan.FromSeconds(0),TimeSpan.FromMilliseconds(200), async () =>

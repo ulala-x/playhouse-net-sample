@@ -51,7 +51,7 @@ namespace SimpleProtocol
 
     public class SimplePacket : IPacket
     {
-        private string _msgId;
+        private int _msgId;
         private IPayload _payload;
         private IMessage? _parsedMessage;
         private ushort _msgSeq;
@@ -59,11 +59,11 @@ namespace SimpleProtocol
 
         public SimplePacket(IMessage message)
         {
-            _msgId = message.Descriptor.Name;
+            _msgId = message.Descriptor.Index;
             _payload = new SimpleProtoPayload(message);
             _parsedMessage = message;
         }
-        public SimplePacket(string msgId,IPayload payload,ushort msgSeq)
+        public SimplePacket(int msgId,IPayload payload,ushort msgSeq)
         {
             _msgId = msgId;
             _payload = new CopyPayload(payload);
@@ -71,7 +71,7 @@ namespace SimpleProtocol
         }
 
         public bool IsRequest => _msgSeq > 0;
-        public string MsgId => _msgId;
+        public int MsgId => _msgId;
         public IPayload Payload => _payload;
         public ushort MsgSeq => _msgSeq;
 

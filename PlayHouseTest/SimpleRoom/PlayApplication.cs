@@ -27,7 +27,7 @@ namespace SimplePlay
                     ServiceId = 2,
                     RequestTimeoutSec = 0,
                     NodeId = 2,
-                    PacketProducer = (string msgId, IPayload payload, ushort msgSeq) => new SimplePacket(msgId, payload, msgSeq),
+                    PacketProducer = (int msgId, IPayload payload, ushort msgSeq) => new SimplePacket(msgId, payload, msgSeq),
                     AddressServerServiceId = apiSvcId,
                     AddressServerEndpoints = { "127.0.0.1:10470" },
                     ServiceProvider = services.BuildServiceProvider(),
