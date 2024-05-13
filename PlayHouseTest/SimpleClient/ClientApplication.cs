@@ -78,7 +78,7 @@ namespace SimpleClient
             //_timer = new Timer((arg) => { connector.MainThreadAction();}, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(10));
             
             bool result = await connector.ConnectAsync(debugMode);
-            string accountId = _sequence.IncrementAndGet().ToString();
+            long accountId = _sequence.IncrementAndGet();
             _log.Info(()=>$"onConnect - [accountId:{accountId},result:{result}]");
 
             if(result == false)
@@ -89,7 +89,7 @@ namespace SimpleClient
             try
             {
                 var response = await connector.AuthenticateAsync(_apiSvcId,
-                    new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
+                    new Packet(new AuthenticateReq() { PlatformUid = accountId.ToString(), Token = "password" }));
 
                 var authenticateRes = AuthenticateRes.Parser.ParseFrom(response.DataSpan);
                 _log.Debug(()=>$"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
@@ -108,8 +108,8 @@ namespace SimpleClient
                     _log.Debug(() =>
                         $"response message - [accountId:{accountId},count:{i},message:{HelloRes.Parser.ParseFrom(helloRes.DataSpan).Message}]");
                 }
-                
-                
+
+
                 connector.Send(_apiSvcId, new Packet(new CloseSessionMsg()));
                 
                 await Task.Delay(1000);
@@ -120,7 +120,7 @@ namespace SimpleClient
                 Thread.Sleep(TimeSpan.FromSeconds(2));
 
                 _log.Info(() => $"before AuthenticateReq - [accountId:{accountId}]");
-                response = await connector.AuthenticateAsync(_apiSvcId, new Packet(new AuthenticateReq() { PlatformUid = accountId, Token = "password" }));
+                response = await connector.AuthenticateAsync(_apiSvcId, new Packet(new AuthenticateReq() { PlatformUid = accountId.ToString(), Token = "password" }));
                 
                  authenticateRes = AuthenticateRes.Parser.ParseFrom(response.DataSpan);
                   _log.Info(()=>$"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
