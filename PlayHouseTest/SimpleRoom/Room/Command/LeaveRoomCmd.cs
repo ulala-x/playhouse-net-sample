@@ -1,19 +1,18 @@
-﻿using PlayHouse.Production;
-using PlayHouse.Production.Play;
+﻿using PlayHouse.Production.Play;
+using PlayHouse.Production.Shared;
 using Simple;
 using SimpleProtocol;
-using PlayHouse.Production.Shared;
 
-namespace SimplePlay.Room.Command
+namespace SimplePlay.Room.Command;
+
+internal class LeaveRoomCmd : IPacketCmd<SimpleRoom, SimpleUser>
 {
-    internal class LeaveRoomCmd : IPacketCmd<SimpleRoom, SimpleUser>
+    public async Task Execute(SimpleRoom room, SimpleUser user, IPacket packet)
     {
-        public async Task Execute(SimpleRoom room, SimpleUser user, IPacket packet)
-        {
-            var request = packet.Parse<LeaveRoomReq>();
+        var request = packet.Parse<LeaveRoomReq>();
 
-            user.ActorSender.SendToApi(
-                new SimplePacket(new LeaveRoomNotify()
+        user.ActorSender.SendToApi(
+            new SimplePacket(new LeaveRoomNotify
                 {
                     SessionEndpoint = user.ActorSender.SessionEndpoint(),
                     Sid = user.ActorSender.Sid(),
@@ -21,14 +20,11 @@ namespace SimplePlay.Room.Command
                 }
             ));
 
-            room.LeaveRoom(user);
-            user.ActorSender.LeaveStage();
+        room.LeaveRoom(user);
+        user.ActorSender.LeaveStage();
 
-            room.StageSender.Reply(new SimplePacket(new LeaveRoomRes() { Data = request.Data}));
+        room.StageSender.Reply(new SimplePacket(new LeaveRoomRes { Data = request.Data }));
 
-            await Task.CompletedTask;
-
-
-        }
+        await Task.CompletedTask;
     }
 }

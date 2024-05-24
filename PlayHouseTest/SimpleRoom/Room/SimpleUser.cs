@@ -1,36 +1,30 @@
 ﻿using PlayHouse.Production.Play;
 using PlayHouse.Service.Play;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SimplePlay.Room
+namespace SimplePlay.Room;
+
+internal class SimpleUser : IActor
 {
-    internal class SimpleUser : IActor
+    private readonly ILogger _log = Log.Logger;
+
+    public SimpleUser(IActorSender sender)
     {
-        private ILogger _log = Log.Logger;
-        private IActorSender _sender;
-        public IActorSender ActorSender => _sender;
+        ActorSender = sender;
+    }
 
-        public SimpleUser(IActorSender sender) { 
-            _sender = sender;
-        }
+    internal long AccountId => ActorSender.AccountId();
+    public IActorSender ActorSender { get; }
 
-        public async Task OnCreate()
-        {
-            _log.Debug($"OnCreate - [accountId:{_sender.AccountId()}]");
-            await Task.CompletedTask;
-        }
+    public async Task OnCreate()
+    {
+        _log.Debug($"OnCreate - [accountId:{ActorSender.AccountId()}]");
+        await Task.CompletedTask;
+    }
 
-        public async Task OnDestroy()
-        {
-            _log.Debug($"OnDestroy - [accountId:{_sender.AccountId()}]");
-            await Task.CompletedTask;
-        }
-
-        internal long AccountId => ActorSender.AccountId();
+    public async Task OnDestroy()
+    {
+        _log.Debug($"OnDestroy - [accountId:{ActorSender.AccountId()}]");
+        await Task.CompletedTask;
     }
 }

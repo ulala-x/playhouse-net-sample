@@ -4,18 +4,8 @@ namespace SimpleApi;
 
 public class AsyncContext
 {
-    private class ErrorCodeWrapper
-    {
-        public ushort Code { get; set; }
-    }
-
     private static readonly AsyncLocal<IApiSender?> _apiSenderContext = new();
     private static readonly AsyncLocal<ErrorCodeWrapper?> _errorCode = new();
-
-    public static void InitErrorCode()
-    {
-        _errorCode.Value = new ErrorCodeWrapper();
-    }
 
     public static IApiSender? ApiSender
     {
@@ -25,14 +15,13 @@ public class AsyncContext
 
     public static ushort ErrorCode
     {
-        get
-        {
-            return _errorCode.Value!.Code;
-        }
-        set
-        {
-            _errorCode.Value!.Code = value;
-        }
+        get => _errorCode.Value!.Code;
+        set => _errorCode.Value!.Code = value;
+    }
+
+    public static void InitErrorCode()
+    {
+        _errorCode.Value = new ErrorCodeWrapper();
     }
 
 
@@ -40,5 +29,10 @@ public class AsyncContext
     {
         _apiSenderContext.Value = null;
         _errorCode.Value = null;
+    }
+
+    private class ErrorCodeWrapper
+    {
+        public ushort Code { get; set; }
     }
 }

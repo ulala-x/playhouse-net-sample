@@ -1,67 +1,63 @@
-﻿using PlayHouse.Service.Api;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PlayHouse.Production.Api;
+using PlayHouse.Production.Shared;
+using PlayHouse.Service.Api;
 using Serilog;
 using SimpleApi.handler;
-using PlayHouse.Production.Api;
-using Microsoft.Extensions.DependencyInjection;
-using ILogger = Serilog.ILogger;
-using SimpleProtocol;
-using PlayHouse.Communicator.Message;
-using PlayHouse.Production.Shared;
 using SimpleApi.System;
-using SimpleApi.Filter;
+using SimpleProtocol;
+using ILogger = Serilog.ILogger;
 
-namespace SimpleApi
+namespace SimpleApi;
+
+public class ApiApplication
 {
-    public class ApiApplication 
+    private readonly ILogger _log = Log.Logger;
+
+    public void Run()
     {
-        private readonly ILogger _log = Log.Logger;
-
-        public void Run()
+        try
         {
-            try
+            ushort apiSvcId = 1;
+            var services = new ServiceCollection();
+            services.AddScoped<SampleApiController>();
+            services.AddScoped<SampleBackendApiForRoom>();
+            services.AddScoped<SampleApiForRoom>();
+            services.AddScoped<SimpleApiSystem>();
+
+
+            _log.Information("api start");
+            var commonOption = new PlayhouseOption
             {
+                Ip = "127.0.0.1",
+                Port = 10470,
+                ServiceId = apiSvcId,
+                RequestTimeoutSec = 0,
+                NodeId = 1,
+                PacketProducer = (msgId, paylaod, msgSeq) => new SimplePacket(msgId, paylaod, msgSeq),
+                AddressServerServiceId = apiSvcId,
+                AddressServerEndpoints = { "127.0.0.1:10470" },
+                ServiceProvider = services.BuildServiceProvider()
+            };
 
-                ushort apiSvcId = 1;
-                ServiceCollection services = new ServiceCollection();
-                services.AddScoped<SampleApiController>();
-                services.AddScoped<SampleBackendApiForRoom>();
-                services.AddScoped<SampleApiForRoom>();
-                services.AddScoped<SimpleApiSystem>();
+            var apiOption = new ApiOption();
+            var apiServer = new ApiServer(commonOption, apiOption);
+            apiServer.Start();
 
-                
-                _log.Information("api start");
-                var commonOption = new PlayhouseOption
-                {
-                    Ip = "127.0.0.1",
-                    Port = 10470,
-                    ServiceId = apiSvcId,
-                    RequestTimeoutSec = 0,
-                    NodeId = 1,
-                    PacketProducer = (int msgId,IPayload paylaod,ushort msgSeq) => new SimplePacket(msgId,paylaod, msgSeq),
-                    AddressServerServiceId = apiSvcId,
-                    AddressServerEndpoints = { "127.0.0.1:10470" },
-                    ServiceProvider = services.BuildServiceProvider(),
-                };
-
-                ApiOption apiOption = new ApiOption();
-                var apiServer = new ApiServer(commonOption, apiOption);
-                apiServer.Start();
-
-                AppDomain.CurrentDomain.ProcessExit +=  async (sender, eventArgs) =>
-                {
-                    _log.Information("*** shutting down Api server since process is shutting down");
-                    await apiServer.StopAsync();
-                    _log.Information("*** server shut down");
-                    Thread.Sleep(1000);
-                };
-
-                _log.Information("Api Server Started");
-                apiServer.AwaitTermination();
-            }
-            catch (Exception ex)
+            AppDomain.CurrentDomain.ProcessExit += async (sender, eventArgs) =>
             {
-                _log.Error(ex, ex.StackTrace ?? ex.Message);
-            }
+                _log.Information("*** shutting down Api server since process is shutting down");
+                await apiServer.StopAsync();
+                _log.Information("*** server shut down");
+                Thread.Sleep(1000);
+            };
+
+            _log.Information("Api Server Started");
+            apiServer.AwaitTermination();
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, ex.StackTrace ?? ex.Message);
         }
     }
 }

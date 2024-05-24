@@ -7,7 +7,7 @@ using Simple;
 
 namespace SimpleSession;
 
-class SessionApplication
+internal class SessionApplication
 {
     private readonly ILogger _log = Log.Logger;
 
@@ -18,7 +18,7 @@ class SessionApplication
             ushort sessionSvcId = 0;
             ushort apiSvcId = 1;
 
-            ServiceCollection services = new ServiceCollection();
+            var services = new ServiceCollection();
 
             var commonOption = new PlayhouseOption
             {
@@ -29,7 +29,7 @@ class SessionApplication
                 NodeId = 0,
                 AddressServerServiceId = apiSvcId,
                 AddressServerEndpoints = { "127.0.0.1:10470" },
-                ServiceProvider = services.BuildServiceProvider(),
+                ServiceProvider = services.BuildServiceProvider()
             };
 
             var sessionOption = new SessionOption
@@ -39,8 +39,8 @@ class SessionApplication
                 Urls = new List<string> { $"{apiSvcId}:{AuthenticateReq.Descriptor.Index}" },
                 ClientIdleTimeoutMSec = 5000
             };
-            
-            
+
+
             var sessionServer = new SessionServer(commonOption, sessionOption);
             sessionServer.Start();
 
