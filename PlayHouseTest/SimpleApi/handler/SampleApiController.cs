@@ -14,11 +14,11 @@ public class SampleApiController : IApiController, IDisconnectCallback
 
     public void Handles(IHandlerRegister register)
     {
-        register.Add(AuthenticateReq.Descriptor.Index, Authenticate);
-        register.Add(HelloReq.Descriptor.Index, Hello);
-        register.Add(Simple.CloseSessionMsg.Descriptor.Index, CloseSessionMsg);
-        register.Add(Simple.TestTimeoutReq.Descriptor.Index, TestTimeoutReq);
-        register.Add(SendMsg.Descriptor.Index, SendMessage);
+        register.Add(AuthenticateReq.Descriptor.Name, Authenticate);
+        register.Add(HelloReq.Descriptor.Name, Hello);
+        register.Add(Simple.CloseSessionMsg.Descriptor.Name, CloseSessionMsg);
+        register.Add(Simple.TestTimeoutReq.Descriptor.Name, TestTimeoutReq);
+        register.Add(SendMsg.Descriptor.Name, SendMessage);
     }
 
 

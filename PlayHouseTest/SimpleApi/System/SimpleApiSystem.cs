@@ -15,7 +15,7 @@ public class SimpleApiSystem : ISystemController, IUpdateServerInfoCallback
 
     public void Handles(ISystemHandlerRegister handlerRegister)
     {
-        handlerRegister.Add(HelloReq.Descriptor.Index, Hello);
+        handlerRegister.Add(HelloReq.Descriptor.Name, Hello);
     }
 
     public async Task<List<IServerInfo>> UpdateServerInfoAsync(IServerInfo serverInfo)
@@ -34,7 +34,7 @@ public class SimpleApiSystem : ISystemController, IUpdateServerInfoCallback
 
         try
         {
-            if (packet.MsgId == HelloReq.Descriptor.Index)
+            if (packet.MsgId == HelloReq.Descriptor.Name)
             {
                 var message = packet.Parse<HelloReq>().Message;
                 sender.Reply(new SimplePacket(new HelloRes { Message = message }));

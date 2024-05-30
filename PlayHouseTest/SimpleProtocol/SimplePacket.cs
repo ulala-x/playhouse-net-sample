@@ -34,11 +34,11 @@ public static class SimplePacketExtention
         return packetObject.Parse<T>();
     }
 
-    public static string GetMsgName(this IPacket packet)
-    {
-        var packetObject = (packet as SimplePacket)!;
-        return packetObject.GetMsgName();
-    }
+    //public static string GetMsgName(this IPacket packet)
+    //{
+    //    var packetObject = (packet as SimplePacket)!;
+    //    return packetObject.GetMsgName();
+    //}
 
     public static IPacket Copy(this IPacket packet)
     {
@@ -54,12 +54,12 @@ public class SimplePacket : IPacket
 
     public SimplePacket(IMessage message)
     {
-        MsgId = message.Descriptor.Index;
+        MsgId = message.Descriptor.Name;
         Payload = new SimpleProtoPayload(message);
         _parsedMessage = message;
     }
 
-    public SimplePacket(int msgId, IPayload payload, ushort msgSeq)
+    public SimplePacket(string msgId, IPayload payload, ushort msgSeq)
     {
         MsgId = msgId;
         Payload = new CopyPayload(payload);
@@ -69,7 +69,7 @@ public class SimplePacket : IPacket
     public bool IsRequest => MsgSeq > 0;
     public ushort MsgSeq { get; }
 
-    public int MsgId { get; }
+    public string MsgId { get; }
 
     public IPayload Payload { get; }
 

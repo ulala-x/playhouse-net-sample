@@ -46,7 +46,7 @@ internal class ClientApplication
 
             if (serviceId == _apiSvcId)
             {
-                if (packet.MsgId == SendMsg.Descriptor.Index)
+                if (packet.MsgId == SendMsg.Descriptor.Name)
                 {
                     _log.Debug(() =>
                         $"api SendMsg message - [msgId:{packet.MsgId}, message:{SendMsg.Parser.ParseFrom(packet.DataSpan).Message}]");
@@ -54,7 +54,7 @@ internal class ClientApplication
             }
             else if (serviceId == _playSvcId)
             {
-                if (packet.MsgId == ChatMsg.Descriptor.Index)
+                if (packet.MsgId == ChatMsg.Descriptor.Name)
                 {
                     _log.Debug(() =>
                         $"stage chat msg -  [msgId:{packet.MsgId},data:{ChatMsg.Parser.ParseFrom(packet.DataSpan).Data}]");
