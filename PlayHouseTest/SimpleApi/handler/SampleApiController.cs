@@ -19,6 +19,22 @@ public class SampleApiController : IApiController, IDisconnectCallback
         register.Add(Simple.CloseSessionMsg.Descriptor.Name, CloseSessionMsg);
         register.Add(Simple.TestTimeoutReq.Descriptor.Name, TestTimeoutReq);
         register.Add(SendMsg.Descriptor.Name, SendMessage);
+        register.Add(Action_PlayActionReq.Descriptor.Name,ReqPlayerActionReq);
+    }
+
+    private async Task ReqPlayerActionReq(IPacket packet, IApiSender apiSender)
+    {
+        var req = packet.Parse<Action_PlayActionReq>();
+        var res = new Action_PlayActionRes
+        {
+            Type = req.Type,
+            Value1 = req.Value1,
+            Value2 = req.Value2,
+            Value3 = req.Value3
+        };
+
+        apiSender.Reply(new SimplePacket(res));
+        await Task.CompletedTask;
     }
 
 

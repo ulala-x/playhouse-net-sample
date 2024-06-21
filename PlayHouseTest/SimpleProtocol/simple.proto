@@ -128,3 +128,19 @@ message HelloToApiReq {
 message HelloToApiRes{
   string data = 1;
 }
+
+message Action_PlayActionReq
+{
+	int32						type = 1;		// 액션상태 타입
+	int64						value1 = 2;		// 조건1
+	int64 						value2 = 3;		// 조건2
+	int64 						value3 = 4;		// 조건3
+}
+
+message Action_PlayActionRes
+{
+	int32						type = 1;		// 액션상태 타입
+	int64						value1 = 2;		// 조건1
+	int64 						value2 = 3;		// 조건2
+	int64 						value3 = 4;		// 조건3
+}

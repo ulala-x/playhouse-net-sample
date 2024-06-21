@@ -36,8 +36,8 @@ internal class ClientApplication
         var connector = new Connector();
         connector.Init(new ConnectorConfig
         {
-            RequestTimeoutMs = 3000, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114,
-            HeartBeatIntervalMs = 1000, ConnectionIdleTimeoutMs = 3000
+            RequestTimeoutMs = 6000, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114,
+            HeartBeatIntervalMs = 0, ConnectionIdleTimeoutMs = 30000
         });
 
         connector.OnReceive += (serviceId, packet) =>
@@ -180,6 +180,24 @@ internal class ClientApplication
                 var createJoinRoomLeaveRes = LeaveRoomRes.Parser.ParseFrom(response.DataSpan);
                 _log.Debug(() =>
                     $"createJoinRoomLeaveRes - [data:{createJoinRoomLeaveRes.Data}]");
+
+                for (int k = 0; k < 12; k++)
+                {
+                   connector.Request(_apiSvcId, new Packet(new Action_PlayActionReq
+                    {
+                        Type = k + 100000,
+                        Value1 = k + 3000000000,
+                        Value2 = k + 4000000000,
+                        Value3 = k + 5000000000
+                    }), packet =>
+                   {
+                       var actionRes = Action_PlayActionRes.Parser.ParseFrom(packet.DataSpan);
+
+                       _log.Debug(() =>
+                           $"playActionReq - [res:{actionRes}]");
+                   } );
+                    
+                }
             }
 
             try
@@ -214,6 +232,6 @@ internal class ClientApplication
 
         _log.Info(() => "finish");
         //await _timer.DisposeAsync();
-        //Environment.Exit(0);
+        Environment.Exit(0);
     }
 }
