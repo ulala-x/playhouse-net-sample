@@ -20,6 +20,27 @@ public class SampleApiController : IApiController, IDisconnectCallback
         register.Add(Simple.TestTimeoutReq.Descriptor.Name, TestTimeoutReq);
         register.Add(SendMsg.Descriptor.Name, SendMessage);
         register.Add(Action_PlayActionReq.Descriptor.Name,ReqPlayerActionReq);
+
+        for (int i = 0; i < 1000; i++)
+        {
+            register.Add($"{HelloReq.Descriptor.Name}_{i}", HelloX);
+
+        }
+        
+    }
+
+    private async Task HelloX(IPacket packet, IApiSender apisender)
+    {
+        var data = DataProto.Parser.ParseFrom(packet.Payload.DataSpan);
+        //_log.Info(()=> $"{packet.MsgId}");
+        //_log.Info(() => $"{data.Message}");
+
+
+        apisender.Reply(new SimplePacket(new DataProto()
+        {
+            Message = data.Message
+        }));
+        await Task.CompletedTask;
     }
 
     private async Task ReqPlayerActionReq(IPacket packet, IApiSender apiSender)

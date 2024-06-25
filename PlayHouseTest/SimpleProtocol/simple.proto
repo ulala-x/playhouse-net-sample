@@ -144,3 +144,9 @@ message Action_PlayActionRes
 	int64 						value2 = 3;		// 조건2
 	int64 						value3 = 4;		// 조건3
 }
+
+message DataProto
+{
+	string message = 1;
+
+}
