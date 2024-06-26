@@ -70,7 +70,7 @@ message CreateJoinRoomRes {
 message LeaveRoomNotify{
   string data = 1;
   string sessionEndpoint = 2;
-  int32 sid = 3;
+  int64 sid = 3;
 }
 //msgId = 13
 message TestTimeoutReq

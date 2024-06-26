@@ -37,7 +37,7 @@ internal class ClientApplication
         connector.Init(new ConnectorConfig
         {
             RequestTimeoutMs = 6000, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114,
-            HeartBeatIntervalMs = 0, ConnectionIdleTimeoutMs = 30000
+            HeartBeatIntervalMs = 1000, ConnectionIdleTimeoutMs = 30000
         });
 
         connector.OnReceive += (serviceId, packet) =>
