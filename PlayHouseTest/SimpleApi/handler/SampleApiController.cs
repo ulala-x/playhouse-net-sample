@@ -99,7 +99,10 @@ public class SampleApiController : IApiController, IDisconnectCallback
             $"Hello - [{req.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}]");
 
         //apiSender.Reply(new ReplyPacket (new Simple.HelloRes { Message = "hello" }));
-        apiSender.Reply(new SimplePacket(new HelloRes()));
+        apiSender.Reply(new SimplePacket(new HelloRes()
+        {
+            Message = "Hello"
+        }));
         await Task.CompletedTask;
     }
 
