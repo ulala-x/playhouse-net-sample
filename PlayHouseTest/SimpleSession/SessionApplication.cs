@@ -15,20 +15,18 @@ internal class SessionApplication
     {
         try
         {
-            ushort sessionSvcId = 0;
-            ushort apiSvcId = 1;
 
             var services = new ServiceCollection();
+
+            services.AddScoped<ISystemController, SimpleSessionSystem>();
 
             var commonOption = new PlayhouseOption
             {
                 Ip = "127.0.0.1",
                 Port = 10370,
-                ServiceId = sessionSvcId,
+                ServiceId = (int)ServiceId.Session,
                 RequestTimeoutSec = 0,
                 NodeId = 0,
-                AddressServerServiceId = apiSvcId,
-                AddressServerEndpoints = { "127.0.0.1:10470" },
                 ServiceProvider = services.BuildServiceProvider()
             };
 
@@ -36,7 +34,7 @@ internal class SessionApplication
             {
                 SessionPort = 10114,
                 UseWebSocket = false,
-                Urls = new List<string> { $"{apiSvcId}:{AuthenticateReq.Descriptor.Name}" },
+                Urls = [$"{(int)ServiceId.Api}:{AuthenticateReq.Descriptor.Name}"],
                 ClientIdleTimeoutMSec = 3000
             };
 

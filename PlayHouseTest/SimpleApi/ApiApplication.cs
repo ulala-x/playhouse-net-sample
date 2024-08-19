@@ -3,6 +3,7 @@ using PlayHouse.Production.Api;
 using PlayHouse.Production.Shared;
 using PlayHouse.Service.Api;
 using Serilog;
+using Simple;
 using SimpleApi.handler;
 using SimpleApi.System;
 using SimpleProtocol;
@@ -18,12 +19,12 @@ public class ApiApplication
     {
         try
         {
-            ushort apiSvcId = 1;
             var services = new ServiceCollection();
             services.AddScoped<SampleApiController>();
             services.AddScoped<SampleBackendApiForRoom>();
             services.AddScoped<SampleApiForRoom>();
             services.AddScoped<SimpleApiSystem>();
+            services.AddScoped<ISystemController, SimpleApiSystem>();
 
 
             _log.Information("api start");
@@ -31,12 +32,10 @@ public class ApiApplication
             {
                 Ip = "127.0.0.1",
                 Port = 10470,
-                ServiceId = apiSvcId,
+                ServiceId = (int)ServiceId.Api,
                 RequestTimeoutSec = 0,
                 NodeId = 1,
                 PacketProducer = (msgId, paylaod, msgSeq) => new SimplePacket(msgId, paylaod, msgSeq),
-                AddressServerServiceId = apiSvcId,
-                AddressServerEndpoints = { "127.0.0.1:10470" },
                 ServiceProvider = services.BuildServiceProvider()
             };
 

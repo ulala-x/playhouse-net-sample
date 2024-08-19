@@ -3,6 +3,7 @@ using PlayHouse.Production.Play;
 using PlayHouse.Production.Shared;
 using PlayHouse.Service.Play;
 using Serilog;
+using Simple;
 using SimplePlay.Room;
 using SimpleProtocol;
 
@@ -16,19 +17,17 @@ internal class PlayApplication
     {
         try
         {
-            ushort apiSvcId = 1;
             var services = new ServiceCollection();
+            services.AddScoped<ISystemController, SimplePlaySystem>();
 
             var commonOption = new PlayhouseOption
             {
                 Ip = "127.0.0.1",
                 Port = 10570,
-                ServiceId = 2,
+                ServiceId = (int)ServiceId.Play,
                 RequestTimeoutSec = 0,
                 NodeId = 2,
                 PacketProducer = (msgId, payload, msgSeq) => new SimplePacket(msgId, payload, msgSeq),
-                AddressServerServiceId = apiSvcId,
-                AddressServerEndpoints = { "127.0.0.1:10470" },
                 ServiceProvider = services.BuildServiceProvider()
             };
 

@@ -5,33 +5,34 @@ namespace SimpleConfigure;
 
 public class SimpleLogger : IPlayHouseLogger
 {
-    public void Debug(Func<string> messageFactory, string className, string methodName)
+
+    public void Debug(Func<FormattableString> messageFactory, string className, string methodName)
     {
-        Log.Logger.Debug($"[{className}] ({methodName}) {messageFactory()}");
+        Log.Logger.InterpolatedDebug($"[{className}] ({methodName}) {messageFactory()}");
     }
 
-    public void Error(Func<string> messageFactory, string className, string methodName)
+    public void Info(Func<FormattableString> messageFactory, string className, string methodName)
     {
-        Log.Logger.Error($"[{className}] ({methodName}) {messageFactory()}");
+        Log.Logger.InterpolatedInformation($"[{className}] ({methodName}) {messageFactory()}");
     }
 
-    public void Fatal(Func<string> messageFactory, string className, string methodName)
+    public void Warn(Func<FormattableString> messageFactory, string className, string methodName)
     {
-        Log.Logger.Fatal($"[{className}] ({methodName}) {messageFactory()}");
+        Log.Logger.InterpolatedWarning($"[{className}] ({methodName}) {messageFactory()}");
     }
 
-    public void Info(Func<string> messageFactory, string className, string methodName)
+    public void Error(Func<FormattableString> messageFactory, string className, string methodName)
     {
-        Log.Logger.Information($"[{className}] ({methodName}) {messageFactory()}");
+        Log.Logger.InterpolatedError($"[{className}] ({methodName}) {messageFactory()}");
     }
 
-    public void Trace(Func<string> messageFactory, string className, string methodName)
+    public void Trace(Func<FormattableString> messageFactory, string className, string methodName)
     {
-        Log.Logger.Verbose($"[{className}] ({methodName}) {messageFactory()}");
+        Log.Logger.InterpolatedVerbose($"[{className}] ({methodName}) {messageFactory()}");
     }
 
-    public void Warn(Func<string> messageFactory, string className, string methodName)
+    public void Fatal(Func<FormattableString> messageFactory, string className, string methodName)
     {
-        Log.Logger.Warning($"[{className}] ({methodName}) {messageFactory()}");
+        Log.Logger.InterpolatedFatal($"[{className}] ({methodName}) {messageFactory()}");
     }
 }

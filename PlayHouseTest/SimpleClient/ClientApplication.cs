@@ -62,7 +62,7 @@ internal class ClientApplication
             }
         };
 
-        connector.OnDisconnect += () => { _log.Info(() => "onDisconnect"); };
+        connector.OnDisconnect += () => { _log.Info(() => $"onDisconnect"); };
 
         //connector.OnError += (serviceId,errorCode,request) =>
         //{
@@ -120,7 +120,7 @@ internal class ClientApplication
 
 
             await connector.ConnectAsync(debugMode);
-            _log.Info(() => "Reconnect");
+            _log.Info(() => $"Reconnect");
             Thread.Sleep(TimeSpan.FromSeconds(2));
 
             _log.Info(() => $"before AuthenticateReq - [accountId:{accountId}]");
@@ -230,7 +230,7 @@ internal class ClientApplication
         await Task.Delay(TimeSpan.FromSeconds(6));
         //Environment.Exit(0);
 
-        _log.Info(() => "finish");
+        _log.Info(() =>$"finish");
         //await _timer.DisposeAsync();
         Environment.Exit(0);
     }

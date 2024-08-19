@@ -23,7 +23,7 @@ internal class SimpleRoom : IStage
         StageSender.AddCountTimer(TimeSpan.FromSeconds(3), 3, TimeSpan.FromSeconds(1), TimerCounter);
         StageSender.AddRepeatTimer(TimeSpan.FromSeconds(0), TimeSpan.FromMilliseconds(200), async () =>
         {
-            _log.Debug(() => "repeat timer");
+            _log.Debug(() => $"repeat timer");
             await Task.CompletedTask;
         });
     }

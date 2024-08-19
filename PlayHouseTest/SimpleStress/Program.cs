@@ -18,29 +18,48 @@ internal class Program
             File.Delete(logFilePath);
         }
 
-        LoggerConfigure.SetLogger(new SimpleLogger(), LogLevel.Info);
+        LoggerConfigure.SetLogger(new SimpleLogger(), LogLevel.Debug);
 
         // Serilog 구성
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Verbose()
-            .WriteTo.Console(LogEventLevel.Debug) // 콘솔에는 정보 레벨 이상만 로그
+            .WriteTo.Console(LogEventLevel.Verbose) // 콘솔에는 정보 레벨 이상만 로그
             .WriteTo.Async(a => a.File(logFilePath, shared: true, restrictedToMinimumLevel: LogEventLevel.Verbose))
             .CreateLogger();
 
-        var tasks = new Task[1000];
 
+        int count = 1000;
+        List<ClientApplication> applications = new List<ClientApplication>();
 
-        for (var i = 0; i < tasks.Length; i++)
+        for (int i = 0; i < count; ++i)
         {
-            tasks[i] = Task.Run(async () =>
+            applications.Add(new ClientApplication());
+        }
+
+        var prePareTask = new Task[count];
+        for (var i = 0; i < count; i++)
+        {
+            int index  = i;
+            prePareTask[i] = Task.Run(async () =>
             {
-                var client = new ClientApplication();
-                await client.RunAsync();
+                await applications[index].PrePareAsync();
             });
         }
 
-        await Task.WhenAll(tasks);
-        //Environment.Exit(0);
+        await Task.WhenAll(prePareTask);
+
+
+        var runTask = new Task[count];
+        for (var i = 0; i < count; i++)
+        {
+            int index = i;
+            runTask[i] = Task.Run(async () =>
+            {
+                await applications[index].RunAsync();
+            });
+        }
+
+        await Task.WhenAll(runTask);
 
         // var client = new ClientApplication();
         // await client.RunAsync();

@@ -1,20 +1,16 @@
 ﻿using PlayHouse.Communicator;
 using PlayHouse.Production.Shared;
-using PlayHouse.Utils;
+using PlayHouse.Service.Shared;
 using Simple;
 using SimpleProtocol;
 
-namespace SimpleApi.System;
+namespace SimpleSession;
 
-public class SimpleApiSystem : ISystemController 
+public class SimpleSessionSystem : ISystemController
 {
-    private readonly LOG<SimpleApiSystem> _log = new();
-
     public void Handles(ISystemHandlerRegister handlerRegister)
     {
-        handlerRegister.Add(HelloReq.Descriptor.Name, Hello);
     }
-
 
     public async Task<IReadOnlyList<IServerInfo>> UpdateServerInfoAsync(IServerInfo serverInfo)
     {
@@ -32,9 +28,9 @@ public class SimpleApiSystem : ISystemController
             }),
             new ServerInfo(new ServerInfoProto
             {
-                BindEndpoint = "tcp://127.0.0.1:10370",
-                ServiceType = ServiceType.SESSION.ToString(),
-                ServcieId = (int)ServiceId.Session,
+                BindEndpoint = "tcp://127.0.0.1:10470",
+                ServiceType = ServiceType.API.ToString(),
+                ServcieId = (int)ServiceId.Api,
                 State = ServerState.RUNNING.ToString(),
                 LastUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ActorCount = 0
@@ -47,38 +43,18 @@ public class SimpleApiSystem : ISystemController
                 State = ServerState.RUNNING.ToString(),
                 LastUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ActorCount = 0
-            })
-
+            }),
         ];
+
         await Task.CompletedTask;
         return servers;
 
-    }
+        //var api =  ControlContext.SystemPanel.GetServerInfoBy((int)ServiceId.Api);
+        //string endpoint = "127.0.0.1:10407";
 
+        //var res = await ControlContext.Sender.RequestToSystem(endpoint, new SimplePacket(new ServerInfoReq()));
 
-    public async Task Hello(IPacket packet, ISystemPanel panel, ISender sender)
-    {
-        _log.Info(() => $"{packet.MsgId} packet received");
-
-        try
-        {
-            if (packet.MsgId == HelloReq.Descriptor.Name)
-            {
-                var message = packet.Parse<HelloReq>().Message;
-                sender.Reply(new SimplePacket(new HelloRes { Message = message }));
-                await Task.CompletedTask;
-            }
-        }
-        catch (Exception e)
-        {
-            _log.Error(() => $"exception message:{e.Message}" );
-            _log.Error(() => $"exception trace:{e.StackTrace}");
-
-            if (e.InnerException != null)
-            {
-                _log.Error(() => $"internal exception message:{e.InnerException.Message}");
-                _log.Error(() => $"internal exception trace:{e.InnerException.StackTrace}");
-            }
-        }
+        //var serverInfoRes = res.Parse<ServerInfoRes>();
+        //return serverInfoRes.ServerInfos.Select(e => new ServerInfo(e)).ToList();
     }
 }

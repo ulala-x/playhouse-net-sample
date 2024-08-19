@@ -1,11 +1,7 @@
-﻿using Google.Protobuf;
-using PlayHouse.Communicator.Message;
-using PlayHouse.Utils;
+﻿using PlayHouse.Utils;
 using PlayHouseConnector;
-using PlayHouseConnector.Network;
 using Simple;
 using Packet = PlayHouseConnector.Packet;
-using ProtoPayload = PlayHouseConnector.ProtoPayload;
 
 namespace SimpleStress;
 
@@ -31,23 +27,98 @@ internal class ClientApplication
     private readonly ushort _apiSvcId = 1;
     private readonly LOG<ClientApplication> _log = new();
     private readonly ushort _playSvcId = 2;
-    private readonly AtomicShort _sequence = new();
+    private static readonly AtomicShort Sequence = new();
+    private readonly Connector _connector = new();
+    private long _accountId;
+    private Thread thread;
 
+    public ClientApplication()
+    {
+        _connector.Init(new ConnectorConfig
+        {
+            RequestTimeoutMs = 6000,
+            EnableLoggingResponseTime = true,
+            Host = "127.0.0.1",
+            Port = 10114,
+            HeartBeatIntervalMs = 1000,
+            ConnectionIdleTimeoutMs = 30000
+        });
+
+        thread = new Thread(() =>
+        {
+            while (true)
+            {
+                _connector.MainThreadAction();
+                Thread.Sleep(1);
+            }
+        });
+        thread.Start();
+
+    }
 
     public async Task RunAsync()
     {
-        var debugMode = false;
-        var connector = new Connector();
-        connector.Init(new ConnectorConfig
+     
+        try
         {
-            RequestTimeoutMs = 6000, EnableLoggingResponseTime = true, Host = "127.0.0.1", Port = 10114,
-            HeartBeatIntervalMs = 1000, ConnectionIdleTimeoutMs = 30000
-        });
 
-        connector.OnReceive += (serviceId, packet) =>
+            Random random = new();
+            for (int i = 0; i < 100; i++)
+            {
+
+                 _connector.Request(_apiSvcId,
+                    new Packet(new HelloReq()
+                        { Message = CreateMessage(random) })
+                    , helloRes =>
+                    {
+                        _log.Debug(() =>
+                            $"response message - [accountId:{_accountId},count:{i},message:{HelloRes.Parser.ParseFrom(helloRes.DataSpan).Message}]");
+                    });
+
+                 //await Task.Delay(1000);
+
+            }
+
+            {
+                var helloRes = await _connector.RequestAsync(_apiSvcId,
+                    new Packet(new HelloReq()
+                        { Message = CreateMessage(random) }));
+
+                _log.Debug(() =>
+                    $"response message - [accountId:{_accountId},count:last,message:{HelloRes.Parser.ParseFrom(helloRes.DataSpan).Message}]");
+            }
+        }
+        catch (PlayConnectorException ex)
         {
-            // _log.Information($"message onReceive - [serviceId:{serviceId},msgId:{packet.MsgId}]");
+            _log.Error(() => $"Request Error - [accountId:{_accountId},ex:{ex.Message}]");
+        }
+        catch (Exception ex)
+        {
+            _log.Error(() => $"Exception- [accountId:{_accountId},ex:{ex}]");
+        }
 
+        await Task.Delay(TimeSpan.FromSeconds(6));
+        //Environment.Exit(0);
+
+        _log.Info(() => $"finish");
+        //await _timer.DisposeAsync();
+        Environment.Exit(0);
+    }
+
+    private  string CreateMessage(Random random)
+    {
+        //return "";
+        return RandomStringGenerator.GenerateRandomString(random.Next(100, 1000));
+    }
+
+    public async Task PrePareAsync()
+    {
+
+        var debugMode = true;
+            
+
+        _connector.OnReceive += (serviceId, packet) =>
+        {
             if (serviceId == _apiSvcId)
             {
                 if (packet.MsgId == SendMsg.Descriptor.Name)
@@ -66,26 +137,11 @@ internal class ClientApplication
             }
         };
 
-        connector.OnDisconnect += () => { _log.Info(() => "onDisconnect"); };
+        _connector.OnDisconnect += () => { _log.Info(() => $"onDisconnect"); };
 
-        //connector.OnError += (serviceId,errorCode,request) =>
-        //{
 
-        //};
-
-        var thread = new Thread(() =>
-        {
-            while (true)
-            {
-                connector.MainThreadAction();
-                Thread.Sleep(1);
-            }
-        });
-        thread.Start();
-        //_timer = new Timer((arg) => { connector.MainThreadAction();}, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(10));
-
-        var result = await connector.ConnectAsync(debugMode);
-        long accountId = _sequence.IncrementAndGet();
+        var result = await _connector.ConnectAsync(debugMode);
+        long accountId = Sequence.IncrementAndGet();
         _log.Info(() => $"onConnect - [accountId:{accountId},result:{result}]");
 
         if (result == false)
@@ -95,148 +151,15 @@ internal class ClientApplication
 
         try
         {
-            var response = await connector.AuthenticateAsync(_apiSvcId,
+            var response = await _connector.AuthenticateAsync(_apiSvcId,
                 new Packet(new AuthenticateReq { PlatformUid = accountId.ToString(), Token = "password" }));
 
             var authenticateRes = AuthenticateRes.Parser.ParseFrom(response.DataSpan);
             _log.Debug(() =>
                 $"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
 
-            //var offSet = 2;
+            _accountId = authenticateRes.AccountId;
 
-            //for (var i = offSet; i < offSet + 10; i++)
-            //{
-            //    if (false == connector.IsConnect())
-            //    {
-            //        return;
-            //    }
-
-            //    var helloRes = await connector.RequestAsync(_apiSvcId, new Packet(new HelloReq { Message = RandomStringGenerator.GenerateRandomString() }));
-
-            //    _log.Debug(() =>
-            //        $"response message - [accountId:{accountId},count:{i},message:{HelloRes.Parser.ParseFrom(helloRes.DataSpan).Message}]");
-            //}
-
-
-            //connector.Send(_apiSvcId, new Packet(new CloseSessionMsg()));
-
-            //await Task.Delay(1000);
-
-
-            //await connector.ConnectAsync(debugMode);
-            //_log.Info(() => "Reconnect");
-            //Thread.Sleep(TimeSpan.FromSeconds(2));
-
-            //_log.Info(() => $"before AuthenticateReq - [accountId:{accountId}]");
-            //response = await connector.AuthenticateAsync(_apiSvcId,
-            //    new Packet(new AuthenticateReq { PlatformUid = accountId.ToString(), Token = "password" }));
-
-            //authenticateRes = AuthenticateRes.Parser.ParseFrom(response.DataSpan);
-            //_log.Info(() =>
-            //    $"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
-
-            //for (var i = 0; i < 10; ++i)
-            //{
-            //    response = await connector.RequestAsync(_apiSvcId,
-            //        new Packet(new CreateRoomReq { Data = "success 1" }));
-
-            //    var createRoomRes = CreateRoomRes.Parser.ParseFrom(response.DataSpan);
-            //    var stageId = createRoomRes.StageId;
-            //    var playEndpoint = createRoomRes.PlayEndpoint;
-
-            //    _log.Debug(() =>
-            //        $"createroom - [playendpoint:{playEndpoint},stageId:{stageId},data:{createRoomRes.Data}]");
-
-            //    response = await connector.RequestAsync(_apiSvcId,
-            //        new Packet(new JoinRoomReq { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 2" }));
-
-
-            //    var joinRoomRes = JoinRoomRes.Parser.ParseFrom(response.DataSpan);
-            //    _log.Debug(() =>
-            //        $"JoinRoomRes - [stageId:{stageId},data:{joinRoomRes.Data}]");
-
-            //    response = await connector.RequestAsync(_playSvcId, stageId,
-            //        new Packet(new LeaveRoomReq { Data = "success 3" }));
-            //    var leaveRoomRes = LeaveRoomRes.Parser.ParseFrom(response.DataSpan);
-
-            //    _log.Debug(() =>
-            //        $"LeaveRoomRes - [data:{leaveRoomRes.Data}]");
-
-            //    //}
-            //    //var playEndpoint = "tcp://10.12.20.59:10570";
-            //    //var stageId = ByteString.CopyFrom(string.Newstring().ToByteArray());
-
-            //    response = await connector.RequestAsync(_apiSvcId,
-            //        new Packet(new CreateJoinRoomReq { PlayEndpoint = playEndpoint, Data = "success 4" }));
-
-            //    var createJoinRoomRes = CreateJoinRoomRes.Parser.ParseFrom(response.DataSpan);
-            //    stageId = createJoinRoomRes.StageId;
-
-            //    _log.Debug(() =>
-            //        $"JoinRoomRes - [stageId: {stageId},data:{createJoinRoomRes.Data}]");
-
-            //    connector.Send(_playSvcId, stageId, new Packet(new ChatMsg { Data = "hi!" }));
-            //    connector.Send(_apiSvcId, new Packet(new SendMsg { Message = "hello!!" }));
-
-            //    response = await connector.RequestAsync(_playSvcId, stageId,
-            //        new Packet(new LeaveRoomReq { Data = "success 5" }));
-
-            //    var createJoinRoomLeaveRes = LeaveRoomRes.Parser.ParseFrom(response.DataSpan);
-            //    _log.Debug(() =>
-            //        $"createJoinRoomLeaveRes - [data:{createJoinRoomLeaveRes.Data}]");
-
-            //    for (int k = 0; k < 12; k++)
-            //    {
-            //       connector.Request(_apiSvcId, new Packet(new Action_PlayActionReq
-            //        {
-            //            Type = k + 100000,
-            //            Value1 = k + 3000000000,
-            //            Value2 = k + 4000000000,
-            //            Value3 = k + 5000000000
-            //        }), packet =>
-            //       {
-            //           var actionRes = Action_PlayActionRes.Parser.ParseFrom(packet.DataSpan);
-
-            //           _log.Debug(() =>
-            //               $"playActionReq - [res:{actionRes}]");
-            //       } );
-
-            //    }
-            //}
-
-            //try
-            //{
-            //    await connector.RequestAsync(_apiSvcId, new Packet(new TestNotRegisterReq()));
-            //}
-            //catch (PlayConnectorException ex)
-            //{
-            //    _log.Error(() => $"Request Error - [accountId:{accountId},{ex.Message}]");
-            //}
-
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    connector.Send(_apiSvcId, new Packet(new SendMsg { Message = "hello!!" }));
-            //    await connector.RequestAsync(_apiSvcId, new Packet(new HelloReq { Message = "hi!" }));
-            //}
-
-            Random random = new();
-            for (int i = 0; i < 100; i++)
-            {
-                var  payload = new ProtoPayload(new DataProto()
-                {
-                    Message = RandomStringGenerator.GenerateRandomString(random.Next(10,100))
-                });
-                var res = await connector.RequestAsync(_apiSvcId, new Packet($"HelloReq_{i}",payload));
-            }
-            
-            //try
-            //{
-            //    await connector.RequestAsync(_apiSvcId, new Packet(new TestTimeoutReq()));
-            //}
-            //catch (PlayConnectorException ex)
-            //{
-            //    _log.Error(() => $"Request Error - [accountId:{accountId},{ex.Message}]");
-            //}
         }
         catch (PlayConnectorException ex)
         {
@@ -247,11 +170,5 @@ internal class ClientApplication
             _log.Error(() => $"Exception- [accountId:{accountId},ex:{ex}]");
         }
 
-        await Task.Delay(TimeSpan.FromSeconds(6));
-        //Environment.Exit(0);
-
-        _log.Info(() => "finish");
-        //await _timer.DisposeAsync();
-        Environment.Exit(0);
     }
 }
