@@ -28,7 +28,7 @@ internal class Program
             .CreateLogger();
 
 
-        int count = 1000;
+        int count = 1;
         List<ClientApplication> applications = new List<ClientApplication>();
 
         for (int i = 0; i < count; ++i)

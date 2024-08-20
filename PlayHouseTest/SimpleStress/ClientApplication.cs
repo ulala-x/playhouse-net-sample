@@ -63,19 +63,36 @@ internal class ClientApplication
         {
 
             Random random = new();
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 200000; i++)
             {
 
+                int index = i;
                  _connector.Request(_apiSvcId,
                     new Packet(new HelloReq()
                         { Message = CreateMessage(random) })
                     , helloRes =>
                     {
                         _log.Debug(() =>
-                            $"response message - [accountId:{_accountId},count:{i},message:{HelloRes.Parser.ParseFrom(helloRes.DataSpan).Message}]");
+                            $"response message - [accountId:{_accountId},count:{index},message:{HelloRes.Parser.ParseFrom(helloRes.DataSpan).Message}]");
                     });
 
-                 //await Task.Delay(1000);
+
+                 _connector.Request(_apiSvcId,
+                     new Packet(new Action_PlayActionReq
+                     {
+                         Type = i + 10000,
+                         Value1 = i + 3000000000,
+                         Value2 = i + 4000000000,
+                         Value3 = i + 5000000000
+                     })
+                     , actionRes =>
+                     {
+                         _log.Debug(() =>
+                             $"response message - [accountId:{_accountId},count:{index},message:{Action_PlayActionReq.Parser.ParseFrom(actionRes.DataSpan)}]");
+                     });
+
+
+                //await Task.Delay(1000);
 
             }
 

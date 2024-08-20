@@ -102,7 +102,7 @@ public class SampleApiController : IApiController, IDisconnectCallback
         //apiSender.Reply(new ReplyPacket (new Simple.HelloRes { Message = "hello" }));
         apiSender.Reply(new SimplePacket(new HelloRes()
         {
-            Message = "Hello"
+            Message = req.Message
         }));
         await Task.CompletedTask;
     }
