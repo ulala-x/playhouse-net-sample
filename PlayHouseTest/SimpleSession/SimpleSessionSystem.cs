@@ -1,6 +1,5 @@
 ﻿using PlayHouse.Communicator;
 using PlayHouse.Production.Shared;
-using PlayHouse.Service.Shared;
 using Simple;
 using SimpleProtocol;
 

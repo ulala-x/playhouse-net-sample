@@ -120,3 +120,13 @@ message ServerInfoProto
 	int64 last_update = 5;
 	int32 actor_count = 6;
 }
+
+message AccessQueueStatusCheckReq
+{
+	string data = 1;
+}
+
+message AccessQueueStatusCheckRes
+{
+	string data = 1;
+}

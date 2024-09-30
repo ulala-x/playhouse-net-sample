@@ -91,6 +91,16 @@ internal class ClientApplication
 
         try
         {
+            string msg = "1234567890qwertyuiop";
+            var statusCheckRes = await connector.RequestAsync((ushort)ServiceId.Session, new Packet(new AccessQueueStatusCheckReq
+            {
+                Data = msg
+            }));
+            var accessQueueStatusCheckRes = Simple.AccessQueueStatusCheckRes.Parser.ParseFrom(statusCheckRes.DataSpan);
+
+            _log.Debug(() =>
+                $"AccessQueueStatusCheckRes - [AccessQueueStatusCheckRes:{accessQueueStatusCheckRes.Data}]");
+
             var response = await connector.AuthenticateAsync(_apiSvcId,
                 new Packet(new AuthenticateReq { PlatformUid = accountId.ToString(), Token = "password" }));
 
