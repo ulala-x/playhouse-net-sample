@@ -17,7 +17,7 @@ internal class Program
             File.Delete(logFilePath);
         }
 
-        LoggerConfigure.SetLogger(new SimpleLogger(), LogLevel.Trace);
+        LoggerConfigure.SetLogger(new SimpleLogger(), LogLevel.Info);
 
         // Serilog 구성
         Log.Logger = new LoggerConfiguration()

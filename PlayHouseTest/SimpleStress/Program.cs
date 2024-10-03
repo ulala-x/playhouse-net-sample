@@ -1,4 +1,5 @@
-﻿using PlayHouse.Utils;
+﻿using System.Diagnostics;
+using PlayHouse.Utils;
 using Serilog;
 using Serilog.Events;
 using SimpleConfigure;
@@ -8,7 +9,7 @@ namespace SimpleStress;
 
 internal class Program
 {
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
         var logFilePath = "logs/simple.txt";
 
@@ -18,7 +19,7 @@ internal class Program
             File.Delete(logFilePath);
         }
 
-        LoggerConfigure.SetLogger(new SimpleLogger(), LogLevel.Debug);
+        LoggerConfigure.SetLogger(new SimpleLogger(), LogLevel.Info);
 
         // Serilog 구성
         Log.Logger = new LoggerConfiguration()
@@ -28,40 +29,20 @@ internal class Program
             .CreateLogger();
 
 
-        int count = 1;
-        List<ClientApplication> applications = new List<ClientApplication>();
+        Stopwatch sw = Stopwatch.StartNew();
+        Log.Logger.Information("Start");
+        var application = new StressApplication(5000);
+        application.Connect();
+        application.Prepare();
+        application.Run();
+        sw.Stop();
+        Log.Logger.Information($"End - elapsed:{sw.ElapsedMilliseconds}");
 
-        for (int i = 0; i < count; ++i)
-        {
-            applications.Add(new ClientApplication());
-        }
-
-        var prePareTask = new Task[count];
-        for (var i = 0; i < count; i++)
-        {
-            int index  = i;
-            prePareTask[i] = Task.Run(async () =>
-            {
-                await applications[index].PrePareAsync();
-            });
-        }
-
-        await Task.WhenAll(prePareTask);
+        //Thread.Sleep(1000);
+        //Environment.Exit(0);
 
 
-        var runTask = new Task[count];
-        for (var i = 0; i < count; i++)
-        {
-            int index = i;
-            runTask[i] = Task.Run(async () =>
-            {
-                await applications[index].RunAsync();
-            });
-        }
-
-        await Task.WhenAll(runTask);
-
-        // var client = new ClientApplication();
+        // var client = new TestClient();
         // await client.RunAsync();
     }
 }
