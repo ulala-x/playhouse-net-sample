@@ -39,12 +39,13 @@ internal class TestClient
     {
         _connector.Init(new ConnectorConfig
         {
-            RequestTimeoutMs = 6000,
+            RequestTimeoutMs = 30000,
             EnableLoggingResponseTime = false,
             Host = "127.0.0.1",
             Port = 10114,
             HeartBeatIntervalMs = 10000,
-            ConnectionIdleTimeoutMs = 30000
+            ConnectionIdleTimeoutMs = 60000,
+            TurnOnTrace = false
         });
 
         //thread = new Thread(() =>
@@ -97,7 +98,7 @@ internal class TestClient
                     });
 
 
-                //await Task.Delay(10);
+                //await Task.Delay(100);
 
             }
 

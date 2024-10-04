@@ -26,7 +26,6 @@ internal class SessionApplication
                 Ip = "127.0.0.1",
                 Port = 10370,
                 ServiceId = (int)ServiceId.Session,
-                RequestTimeoutSec = 0,
                 NodeId = 0,
                 PacketProducer = (msgId, payload, msgSeq) => new SimplePacket(msgId, payload, msgSeq),
                 ServiceProvider = services.BuildServiceProvider()
@@ -37,7 +36,7 @@ internal class SessionApplication
                 SessionPort = 10114,
                 UseWebSocket = false,
                 Urls = [$"{(int)ServiceId.Api}:{AuthenticateReq.Descriptor.Name}"],
-                ClientIdleTimeoutMSec = 3000,
+                ClientIdleTimeoutMSec = 0,
                 SessionUserFactory = ()=> new SimpleUser()
 
             };
