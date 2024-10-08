@@ -37,7 +37,7 @@ internal class SessionApplication
                 UseWebSocket = false,
                 Urls = [$"{(int)ServiceId.Api}:{AuthenticateReq.Descriptor.Name}"],
                 ClientIdleTimeoutMSec = 0,
-                SessionUserFactory = ()=> new SimpleUser()
+                SessionUserFactory = (sender)=> new SimpleUser(sender)
 
             };
 

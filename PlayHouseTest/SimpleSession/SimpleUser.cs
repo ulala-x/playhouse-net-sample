@@ -5,9 +5,9 @@ using SimpleProtocol;
 
 namespace SimpleSession;
 
-class SimpleUser : ISessionUser
+class SimpleUser(ISessionSender sender) : ISessionUser
 {
-    public async  Task OnDispatch(IPacket packet, ISessionSender sender)
+    public async  Task OnDispatch(IPacket packet)
     {
         if (packet.MsgId == AccessQueueStatusCheckReq.Descriptor.Name)
         {
