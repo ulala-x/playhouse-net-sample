@@ -58,6 +58,23 @@ message TestTimeoutReq
 message TestNotRegisterReq
 {
 }
+message CompressReq
+{
+	
+}
+message CompressRes
+{
+	string data = 1;
+}
+message DuplicatedPacketReq
+{
+	int32 data = 1;
+}
+
+message DuplicatedPacketRes
+{
+	int32 data = 1;
+}
 
 //////////////////for room/////////////
 message CreateRoomAsk{

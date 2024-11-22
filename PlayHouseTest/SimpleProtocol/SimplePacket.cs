@@ -4,16 +4,9 @@ using PlayHouse.Production.Shared;
 
 namespace SimpleProtocol;
 
-public class SimpleProtoPayload : IPayload
+public class SimpleProtoPayload(IMessage proto) : IPayload
 {
-    private readonly IMessage _proto;
-
-    public SimpleProtoPayload(IMessage proto)
-    {
-        _proto = proto;
-    }
-
-    public ReadOnlyMemory<byte> Data => _proto.ToByteArray();
+    public ReadOnlyMemory<byte> Data => proto.ToByteArray();
 
 
     public void Dispose()
@@ -22,7 +15,7 @@ public class SimpleProtoPayload : IPayload
 
     public IMessage GetProto()
     {
-        return _proto;
+        return proto;
     }
 }
 

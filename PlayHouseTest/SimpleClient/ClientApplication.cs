@@ -80,6 +80,7 @@ internal class ClientApplication
         thread.Start();
         //_timer = new Timer((arg) => { connector.MainThreadAction();}, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(10));
 
+        connector.ClearCache();
         var result = await connector.ConnectAsync(debugMode);
         long accountId = _sequence.IncrementAndGet();
         _log.Info(() => $"onConnect - [accountId:{accountId},result:{result}]");
@@ -128,7 +129,7 @@ internal class ClientApplication
 
             await Task.Delay(1000);
 
-
+            connector.ClearCache();
             await connector.ConnectAsync(debugMode);
             _log.Info(() => $"Reconnect");
             Thread.Sleep(TimeSpan.FromSeconds(2));
@@ -140,6 +141,26 @@ internal class ClientApplication
             authenticateRes = AuthenticateRes.Parser.ParseFrom(response.DataSpan);
             _log.Info(() =>
                 $"AuthenticateRes - [accountId:{authenticateRes.AccountId},userId:{authenticateRes.UserInfo}]");
+
+            var compressResPacket = await connector.RequestAsync(_apiSvcId, 
+                new Packet(new CompressReq()));
+
+            var compressRes = CompressRes.Parser.ParseFrom(compressResPacket.DataSpan);
+            _log.Info(()=>$"compress res - {compressRes.Data}");
+
+            var duplicatePacketRes = await connector.RequestAsync(_apiSvcId,  
+                new Packet(new DuplicatedPacketReq{Data = 1}), 10000);
+
+            var duplicateRes = DuplicatedPacketRes.Parser.ParseFrom(duplicatePacketRes.DataSpan);
+
+            _log.Info(() => $"duplicate 1 - res - {duplicateRes.Data}");
+
+            var duplicatePacketRes2 = await connector.RequestAsync(_apiSvcId, 
+                new Packet(new DuplicatedPacketReq { Data = 2 }),10000);
+
+            var duplicateRes2 = DuplicatedPacketRes.Parser.ParseFrom(duplicatePacketRes2.DataSpan);
+
+            _log.Info(() => $"duplicate 2 - res - {duplicateRes2.Data}");
 
             for (var i = 0; i < 10; ++i)
             {
