@@ -11,7 +11,12 @@ class SimpleUser(ISessionSender sender) : ISessionUser
     {
         if (packet.MsgId == AccessQueueStatusCheckReq.Descriptor.Name)
         {
-            sender.ReplyToClient(new SimplePacket(new AccessQueueStatusCheckRes()));
+            var req = AccessQueueStatusCheckReq.Parser.ParseFrom(packet.Payload.DataSpan);
+
+            sender.ReplyToClient(new SimplePacket(new AccessQueueStatusCheckRes
+            {
+                Data = req.Data
+            }));
         }
 
         await Task.CompletedTask;

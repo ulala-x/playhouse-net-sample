@@ -86,7 +86,7 @@ public class SampleApiController : IApiController, IDisconnectCallback
         //long accountId = ControlContext.SystemPanel.GenerateUUID();
 
 
-        apiSender.Authenticate(accountId);
+        await apiSender.AuthenticateAsync(accountId);
 
         var message = new AuthenticateRes { AccountId = accountId, UserInfo = accountId.ToString() };
         apiSender.Reply(new SimplePacket(message));
