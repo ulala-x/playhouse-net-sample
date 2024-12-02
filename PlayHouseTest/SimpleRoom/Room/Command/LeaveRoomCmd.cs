@@ -14,7 +14,7 @@ internal class LeaveRoomCmd : IPacketCmd<SimpleRoom, SimpleUser>
         user.ActorSender.SendToApi(
             new SimplePacket(new LeaveRoomNotify
                 {
-                    SessionEndpoint = user.ActorSender.SessionEndpoint(),
+                    SessionNid = user.ActorSender.SessionNid(),
                     Sid = user.ActorSender.Sid(),
                     Data = request.Data
                 }

@@ -35,10 +35,10 @@ public class SampleApiForRoom : IApiController
         var data = packet.Parse<CreateRoomReq>().Data;
         var randRoomServerInfo = _systemPanel!.GetServerInfoBy(RoomServiceId);
 
-        var roomEndpoint = randRoomServerInfo.GetBindEndpoint();
+        var nid = randRoomServerInfo.GetNid();
         var stageId = _systemPanel.GenerateUUID();
 
-        var result = await apiSender.CreateStage(roomEndpoint, RoomType, stageId,
+        var result = await apiSender.CreateStage(nid, RoomType, stageId,
             new SimplePacket(new CreateRoomAsk { Data = data }));
 
         var createRoomAnswer = CreateRoomAnswer.Parser.ParseFrom(result.CreateStageRes.Payload.Data.Span);
@@ -50,7 +50,7 @@ public class SampleApiForRoom : IApiController
             apiSender.Reply(new SimplePacket(new CreateRoomRes
             {
                 Data = createRoomAnswer.Data,
-                PlayEndpoint = roomEndpoint,
+                PlayNid = nid,
                 StageId = stageId
             }));
         }
@@ -65,7 +65,7 @@ public class SampleApiForRoom : IApiController
         var request = packet.Parse<JoinRoomReq>();
         var data = request.Data;
         var stageId = request.StageId;
-        var roomEndpoint = request.PlayEndpoint;
+        var roomEndpoint = request.PlayNid;
 
         _log.Debug(() =>
             $"joinRoom - [accountId:{apiSender.AccountId},sid:{apiSender.Sid},stageId:{stageId} msgName:{packet.MsgId}]");
@@ -96,7 +96,7 @@ public class SampleApiForRoom : IApiController
         var request = packet.Parse<CreateJoinRoomReq>();
         var data = request.Data;
         var stageId = _systemPanel.GenerateUUID();
-        var roomEndpoint = request.PlayEndpoint;
+        var roomEndpoint = request.PlayNid;
         var createPayload = new SimplePacket(new CreateRoomAsk { Data = data });
 
         var joinPayload = new SimplePacket(new JoinRoomAsk { Data = data });
@@ -133,7 +133,7 @@ public class SampleBackendApiForRoom : IApiBackendController
 
 
         var notify = packet.Parse<LeaveRoomNotify>();
-        backendSender.SendToClient(notify.SessionEndpoint, notify.Sid, new SimplePacket(notify));
+        backendSender.SendToClient(notify.SessionNid, notify.Sid, new SimplePacket(notify));
         await Task.CompletedTask;
     }
 

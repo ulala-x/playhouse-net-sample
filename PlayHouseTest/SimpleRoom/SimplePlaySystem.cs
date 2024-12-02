@@ -21,6 +21,7 @@ public class SimplePlaySystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = serverInfo.GetBindEndpoint(),
+                Nid = serverInfo.GetNid(),
                 ServiceType = serverInfo.GetServiceType().ToString(),
                 ServcieId = serverInfo.GetServiceId(),
                 State = serverInfo.GetState().ToString(),
@@ -30,6 +31,7 @@ public class SimplePlaySystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = "tcp://127.0.0.1:10470",
+                Nid = 2,
                 ServiceType = ServiceType.API.ToString(),
                 ServcieId = (int)ServiceId.Api,
                 State = ServerState.RUNNING.ToString(),
@@ -39,6 +41,7 @@ public class SimplePlaySystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = "tcp://127.0.0.1:10370",
+                Nid = 1,
                 ServiceType = ServiceType.SESSION.ToString(),
                 ServcieId = (int)ServiceId.Session,
                 State = ServerState.RUNNING.ToString(),

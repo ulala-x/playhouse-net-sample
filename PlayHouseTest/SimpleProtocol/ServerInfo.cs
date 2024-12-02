@@ -11,6 +11,11 @@ public class ServerInfo(ServerInfoProto serverInfo) : IServerInfo
         return serverInfo.BindEndpoint;
     }
 
+    public int GetNid()
+    {
+        return serverInfo.Nid;
+    }
+
     public ServiceType GetServiceType()
     {
         return Enum.Parse<ServiceType>(serverInfo.ServiceType, true);

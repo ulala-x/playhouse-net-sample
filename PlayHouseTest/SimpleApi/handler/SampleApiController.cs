@@ -107,7 +107,7 @@ public class SampleApiController : IApiController, IDisconnectCallback
     private async Task ReqTestTimeout(IPacket packet, IApiSender apiSender)
     {
         _log.Debug(() =>
-            $"TestTimeoutReq - accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
+            $"TestTimeoutReq - accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionNid},sid:{apiSender.Sid}");
         await Task.CompletedTask;
     }
 
@@ -134,7 +134,7 @@ public class SampleApiController : IApiController, IDisconnectCallback
     {
         var req = packet.Parse<HelloReq>();
         _log.Debug(() =>
-            $"Hello - [{req.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}]");
+            $"Hello - [{req.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionNid},sid:{apiSender.Sid}]");
 
         //apiSender.Reply(new ReplyPacket (new Simple.HelloRes { Message = "hello" }));
         apiSender.Reply(new SimplePacket(new HelloRes()
@@ -148,7 +148,7 @@ public class SampleApiController : IApiController, IDisconnectCallback
     {
         var recv = packet.Parse<SendMsg>();
         _log.Debug(() =>
-            $"Message - [message:{recv.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}]");
+            $"Message - [message:{recv.Message},accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionNid},sid:{apiSender.Sid}]");
 
         await Task.Delay(100);
         SendTestApiSenderContext(recv.Message);
@@ -163,9 +163,9 @@ public class SampleApiController : IApiController, IDisconnectCallback
     private async Task MsgCloseSession(IPacket packet, IApiSender apiSender)
     {
         _log.Debug(() =>
-            $"CloseSessionMsg - accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionEndpoint},sid:{apiSender.Sid}");
+            $"CloseSessionMsg - accountId:{apiSender.AccountId},sessionEndpoint:{apiSender.SessionNid},sid:{apiSender.Sid}");
         apiSender.SendToClient(new SimplePacket(new CloseSessionMsg()));
-        apiSender.SessionClose(apiSender.SessionEndpoint, apiSender.Sid);
+        apiSender.SessionClose(apiSender.SessionNid, apiSender.Sid);
         await Task.CompletedTask;
     }
 }

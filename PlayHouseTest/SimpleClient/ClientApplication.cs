@@ -169,13 +169,13 @@ internal class ClientApplication
 
                 var createRoomRes = CreateRoomRes.Parser.ParseFrom(response.DataSpan);
                 var stageId = createRoomRes.StageId;
-                var playEndpoint = createRoomRes.PlayEndpoint;
+                var playEndpoint = createRoomRes.PlayNid;
 
                 _log.Debug(() =>
                     $"createroom - [playendpoint:{playEndpoint},stageId:{stageId},data:{createRoomRes.Data}]");
 
                 response = await connector.RequestAsync(_apiSvcId,
-                    new Packet(new JoinRoomReq { PlayEndpoint = playEndpoint, StageId = stageId, Data = "success 2" }));
+                    new Packet(new JoinRoomReq { PlayNid = playEndpoint, StageId = stageId, Data = "success 2" }));
 
 
                 var joinRoomRes = JoinRoomRes.Parser.ParseFrom(response.DataSpan);
@@ -194,7 +194,7 @@ internal class ClientApplication
                 //var stageId = ByteString.CopyFrom(string.Newstring().ToByteArray());
 
                 response = await connector.RequestAsync(_apiSvcId,
-                    new Packet(new CreateJoinRoomReq { PlayEndpoint = playEndpoint, Data = "success 4" }));
+                    new Packet(new CreateJoinRoomReq { PlayNid = playEndpoint, Data = "success 4" }));
 
                 var createJoinRoomRes = CreateJoinRoomRes.Parser.ParseFrom(response.DataSpan);
                 stageId = createJoinRoomRes.StageId;

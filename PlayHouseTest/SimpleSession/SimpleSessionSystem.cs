@@ -19,6 +19,7 @@ public class SimpleSessionSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = serverInfo.GetBindEndpoint(),
+                Nid = serverInfo.GetNid(),
                 ServiceType = serverInfo.GetServiceType().ToString(),
                 ServcieId = serverInfo.GetServiceId(),
                 State = serverInfo.GetState().ToString(),
@@ -28,6 +29,7 @@ public class SimpleSessionSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = "tcp://127.0.0.1:10470",
+                Nid = 2,
                 ServiceType = ServiceType.API.ToString(),
                 ServcieId = (int)ServiceId.Api,
                 State = ServerState.RUNNING.ToString(),
@@ -37,6 +39,7 @@ public class SimpleSessionSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = "tcp://127.0.0.1:10570",
+                Nid = 3,
                 ServiceType = ServiceType.Play.ToString(),
                 ServcieId = (int)ServiceId.Play,
                 State = ServerState.RUNNING.ToString(),
