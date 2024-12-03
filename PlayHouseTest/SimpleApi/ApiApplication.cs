@@ -34,7 +34,7 @@ public class ApiApplication
                 Port = 10470,
                 ServiceId = (int)ServiceId.Api,
                 RequestTimeoutSec = 0,
-                Nid = 2,
+                ServerId = 0,
                 PacketProducer = (msgId, paylaod, msgSeq) => new SimplePacket(msgId, paylaod, msgSeq),
                 ServiceProvider = services.BuildServiceProvider()
             };

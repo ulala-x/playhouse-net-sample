@@ -11,9 +11,14 @@ public class ServerInfo(ServerInfoProto serverInfo) : IServerInfo
         return serverInfo.BindEndpoint;
     }
 
-    public int GetNid()
+    public string GetNid()
     {
         return serverInfo.Nid;
+    }
+
+    public int GetServerId()
+    {
+        return serverInfo.ServerId;
     }
 
     public ServiceType GetServiceType()

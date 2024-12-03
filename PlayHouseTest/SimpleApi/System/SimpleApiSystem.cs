@@ -1,4 +1,5 @@
-﻿using PlayHouse.Communicator;
+﻿using System.Web.Services.Description;
+using PlayHouse.Communicator;
 using PlayHouse.Production.Shared;
 using PlayHouse.Utils;
 using Simple;
@@ -24,9 +25,11 @@ public class SimpleApiSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = serverInfo.GetBindEndpoint(),
+                ServcieId = serverInfo.GetServiceId(),
+                ServerId = serverInfo.GetServerId(),
                 Nid = serverInfo.GetNid(),
                 ServiceType = serverInfo.GetServiceType().ToString(),
-                ServcieId = serverInfo.GetServiceId(),
+                
                 State = serverInfo.GetState().ToString(),
                 LastUpdate = serverInfo.GetLastUpdate(),
                 ActorCount = serverInfo.GetActorCount()
@@ -34,9 +37,10 @@ public class SimpleApiSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = "tcp://127.0.0.1:10370",
-                Nid = 1,
-                ServiceType = ServiceType.SESSION.ToString(),
                 ServcieId = (int)ServiceId.Session,
+                ServerId = 0,
+                Nid = $"{ServiceId.Session.GetHashCode()}:0",
+                ServiceType = ServiceType.SESSION.ToString(),
                 State = ServerState.RUNNING.ToString(),
                 LastUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ActorCount = 0
@@ -44,9 +48,10 @@ public class SimpleApiSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = "tcp://127.0.0.1:10570",
-                Nid = 3,
-                ServiceType = ServiceType.Play.ToString(),
                 ServcieId = (int)ServiceId.Play,
+                ServerId = 0,
+                Nid = $"{ServiceId.Play.GetHashCode()}:0",
+                ServiceType = ServiceType.Play.ToString(),
                 State = ServerState.RUNNING.ToString(),
                 LastUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ActorCount = 0

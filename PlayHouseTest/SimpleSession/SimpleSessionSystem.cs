@@ -19,9 +19,10 @@ public class SimpleSessionSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = serverInfo.GetBindEndpoint(),
+                ServcieId = serverInfo.GetServiceId(),
+                ServerId = serverInfo.GetServerId(),
                 Nid = serverInfo.GetNid(),
                 ServiceType = serverInfo.GetServiceType().ToString(),
-                ServcieId = serverInfo.GetServiceId(),
                 State = serverInfo.GetState().ToString(),
                 LastUpdate = serverInfo.GetLastUpdate(),
                 ActorCount = serverInfo.GetActorCount()
@@ -29,9 +30,10 @@ public class SimpleSessionSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = "tcp://127.0.0.1:10470",
-                Nid = 2,
-                ServiceType = ServiceType.API.ToString(),
                 ServcieId = (int)ServiceId.Api,
+                ServerId = 0,
+                Nid = $"{ServiceId.Api.GetHashCode()}:0",
+                ServiceType = ServiceType.API.ToString(),
                 State = ServerState.RUNNING.ToString(),
                 LastUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ActorCount = 0
@@ -39,9 +41,10 @@ public class SimpleSessionSystem : ISystemController
             new ServerInfo(new ServerInfoProto
             {
                 BindEndpoint = "tcp://127.0.0.1:10570",
-                Nid = 3,
-                ServiceType = ServiceType.Play.ToString(),
                 ServcieId = (int)ServiceId.Play,
+                ServerId = 0,
+                Nid = $"{ServiceId.Play.GetHashCode()}:0",
+                ServiceType = ServiceType.Play.ToString(),
                 State = ServerState.RUNNING.ToString(),
                 LastUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ActorCount = 0

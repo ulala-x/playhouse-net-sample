@@ -26,7 +26,7 @@ internal class SessionApplication
                 Ip = "127.0.0.1",
                 Port = 10370,
                 ServiceId = (int)ServiceId.Session,
-                Nid = 1,
+                ServerId = 0,
                 PacketProducer = (msgId, payload, msgSeq) => new SimplePacket(msgId, payload, msgSeq),
                 ServiceProvider = services.BuildServiceProvider()
             };

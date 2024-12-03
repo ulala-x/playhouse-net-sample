@@ -27,10 +27,10 @@ message CreateRoomReq{
 message CreateRoomRes{
   int64 stage_id = 1;
   string data = 2;
-  int32 playNid = 3;
+  string playNid = 3;
 }
 message JoinRoomReq{
-  int32 playNid = 1;
+  string playNid = 1;
   int64 stage_id = 2;
   int64 account_id = 3;
   string data = 4;
@@ -39,7 +39,7 @@ message JoinRoomRes{
   string data = 1;
 }
 message CreateJoinRoomReq {
-  int32 playNid = 1;
+  string playNid = 1;
   int64 account_id = 2;
   string data = 3;
 }
@@ -49,7 +49,7 @@ message CreateJoinRoomRes {
 }
 message LeaveRoomNotify{
   string data = 1;
-  int32 sessionNid = 2;
+  string sessionNid = 2;
   int64 sid = 3;
 }
 message TestTimeoutReq
@@ -133,10 +133,11 @@ message ServerInfoProto
 	string bind_endpoint = 1;
 	string service_type = 2;
 	int32  servcie_id = 3;
-	string state = 4;
-	int64 last_update = 5;
-	int32 actor_count = 6;
-	int32 nid = 7;
+	int32 server_id = 4;
+	string nid = 5;
+	string state = 6;
+	int64 last_update = 7;
+	int32 actor_count = 8;
 }
 
 message AccessQueueStatusCheckReq
