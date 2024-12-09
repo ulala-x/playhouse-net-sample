@@ -122,12 +122,12 @@ public class SampleApiController : IApiController, IDisconnectCallback
         var accountId = long.Parse(req.PlatformUid);
         //long accountId = ControlContext.SystemPanel.GenerateUUID();
 
-
         await apiSender.AuthenticateAsync(accountId);
 
         var message = new AuthenticateRes { AccountId = accountId, UserInfo = accountId.ToString() };
         apiSender.Reply(new SimplePacket(message));
         await Task.CompletedTask;
+        
     }
 
     private async Task Hello(IPacket packet, IApiSender apiSender)

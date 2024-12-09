@@ -30,6 +30,7 @@ public class SimpleAspectifyAttribute : AspectifyAttribute
         _log.Debug(() => $"from client - [accountId:{sender.AccountId}, transfered:{simplePacket}]");
 
         await invocation.Proceed();
+        
         foreach (var packetInfo in PacketContext.SendPackets)
         {
             var type = packetInfo.Target;

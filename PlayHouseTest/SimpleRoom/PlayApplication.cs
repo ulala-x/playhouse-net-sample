@@ -26,7 +26,7 @@ internal class PlayApplication
                 Port = 10570,
                 ServiceId = (int)ServiceId.Play,
                 ServerId = 0,
-                RequestTimeoutSec = 0,
+                RequestTimeoutMSec = 0,
                 PacketProducer = (msgId, payload, msgSeq) => new SimplePacket(msgId, payload, msgSeq),
                 ServiceProvider = services.BuildServiceProvider()
             };

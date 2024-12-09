@@ -45,4 +45,9 @@ public class ServerInfo(ServerInfoProto serverInfo) : IServerInfo
     {
         return serverInfo.ActorCount;
     }
+
+    public void SetActorCount(int count)
+    {
+        serverInfo.ActorCount = count;
+    }
 }
